@@ -20,7 +20,43 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("note entry error");
 		Response response = new Response();
 		response.setMessage("note entry error, " + e.getMessage());
-		response.setStatus(1);
+		response.setStatus(101);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NoteNotFoundException.class)
+	public ResponseEntity<Response> noteNotFoundExceptionHandler(NoteNotFoundException e) {
+		logger.error("note not found error");
+		Response response = new Response();
+		response.setMessage("note not found exception, " + e.getMessage());
+		response.setStatus(201);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<Response> userNotFoundExceptionHandler(NoteNotFoundException e) {
+		logger.error("note not found error");
+		Response response = new Response();
+		response.setMessage("note not found exception, " + e.getMessage());
+		response.setStatus(301);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NullEntryException.class)
+	public ResponseEntity<Response> nullEntryExceptionHandler(NullEntryException e) {
+		logger.error("null value error");
+		Response response = new Response();
+		response.setMessage("null value exception, " + e.getMessage());
+		response.setStatus(401);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(UntrashedException.class)
+	public ResponseEntity<Response> untrashedExceptionHandler(NullEntryException e) {
+		logger.error("note untrashed error");
+		Response response = new Response();
+		response.setMessage("note untrashed exception, " + e.getMessage());
+		response.setStatus(401);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	/*@ExceptionHandler(Exception.class)

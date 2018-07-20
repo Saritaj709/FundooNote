@@ -6,6 +6,7 @@ import java.util.Optional;
 import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -35,7 +36,16 @@ public class UserServiceImpl implements UserService {
 	
 	@Autowired
 	private JwtToken jwtToken;
-
+	
+	@Value("${accountActivationLink}")
+	private String accountActivationLink;
+	
+	@Value("${passwordResetLink}")
+	private String passwordResetLink;
+	
+	@Value("${KEY}")
+    private String KEY;
+    
 	@Override
 	public List<User> getAllUsers() {
 
@@ -69,8 +79,7 @@ public class UserServiceImpl implements UserService {
 		MailDTO mail = new MailDTO();
 		mail.setTo(dto.getEmail());
 		mail.setSubject("Account activation mail");
-		mail.setText("Click here to verify your account:\n\n" + "http://192.168.0.73:8080/user/activateaccount/?token="
-				+ jwt);
+		mail.setText("accountActivationLink"+ jwt);
 		producer.sender(mail);
 
 		return jwt;
@@ -146,7 +155,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean activateJwt(String token) {
 
-		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary("Sarita")).parseClaimsJws(token)
+		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary("KEY")).parseClaimsJws(token)
 				.getBody();
 
 		Optional<User> user = userRepository.findById(claims.getSubject());
@@ -159,7 +168,7 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public boolean activate(String token,String id) {
 
-		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary("Sarita")).parseClaimsJws(token)
+		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary("KEY")).parseClaimsJws(token)
 				.getBody();
 
 		Optional<User> user = userRepository.findById(claims.getSubject());
@@ -188,7 +197,7 @@ public class UserServiceImpl implements UserService {
 		MailDTO mail = new MailDTO();
 		mail.setTo(email);
 		mail.setSubject("Password reset mail");
-		mail.setText("http://localhost:8080/user/resetpassword/?token=" + generatedToken);
+		mail.setText("passwordResetLink" + generatedToken);
 
 		producer.sender(mail);
 	}

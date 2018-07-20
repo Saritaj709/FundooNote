@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
 		logger.error("Registration exception");
 		ResponseDTO response=new ResponseDTO();
 		response.setMessage("Registration error "+e.getMessage());
-		response.setStatus(1);
+		response.setStatus(1101);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
 	@ExceptionHandler(LoginException.class)
@@ -28,7 +28,15 @@ public class GlobalExceptionHandler {
 		logger.error("Login exception");
 		ResponseDTO response=new ResponseDTO();
 		response.setMessage("Login error, "+e.getMessage());
-		response.setStatus(2);
+		response.setStatus(1102);
+		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+	}
+	@ExceptionHandler(UserNotFoundException.class)
+	public ResponseEntity<ResponseDTO> userNotFoundExceptionHandler(UserNotFoundException e){
+		logger.error("User not found exception");
+		ResponseDTO response=new ResponseDTO();
+		response.setMessage("User not found Exception, "+e.getMessage());
+		response.setStatus(1103);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
 	/*@ExceptionHandler(Exception.class)
