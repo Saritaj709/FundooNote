@@ -2,13 +2,13 @@ package com.bridgelabz.fundonotes.note.controller;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -28,7 +28,6 @@ import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.model.ViewDTO;
 import com.bridgelabz.fundonotes.note.services.NoteService;
-import com.bridgelabz.fundonotes.user.model.User;
 
 @RestController
 @RequestMapping("/api/notes")
@@ -39,7 +38,7 @@ public class NoteController {
 
 	// -------------Create A New Note----------------------
 
-	@PostMapping("/create")
+	@PostMapping(value="/create")
 	public ResponseEntity<Response> createNote(@RequestParam String token, @RequestBody CreateDTO create)
 			throws NoteCreationException, NoteNotFoundException, UserNotFoundException {
 
@@ -55,9 +54,9 @@ public class NoteController {
 
 	// ------------Update An Existing Note-------------------
 
-	@PutMapping(value="/update")
+	@PutMapping(value="/update/{noteId}")
 	public ResponseEntity<Response> updateNote(@RequestParam String token, @RequestBody UpdateDTO update,
-			@RequestParam String noteId) throws NoteNotFoundException, UserNotFoundException {
+			@PathVariable String noteId) throws NoteNotFoundException, UserNotFoundException {
 
 		noteService.updateNote(token, update, noteId);
 
@@ -71,8 +70,8 @@ public class NoteController {
 
 	// ------------Move An Existing Note To Trash---------------
 
-	@PostMapping("/trash")
-	public ResponseEntity<Response> moveNoteToTrash(@RequestParam String token, @RequestParam String userId,@RequestParam
+	@PostMapping(value="/trash/{noteId}")
+	public ResponseEntity<Response> moveNoteToTrash(@RequestParam String token, @RequestParam String userId,@PathVariable
 			String noteId) throws NoteNotFoundException, UserNotFoundException {
 
 		noteService.moveNoteToTrash(token, userId, noteId);
@@ -87,9 +86,9 @@ public class NoteController {
 
 	// ----------Delete An Existing Note From Trash--------------
 
-	@DeleteMapping(value="/delete")
+	@DeleteMapping(value="/delete/{noteId}")
 	public ResponseEntity<Response> deleteNote(@RequestParam String token, @RequestParam String userId,
-			@RequestParam String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException {
+			@PathVariable String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException {
 
 		noteService.deleteNote(token, userId, noteId);
 
@@ -115,10 +114,24 @@ public class NoteController {
 		return new ResponseEntity<>(noteService.readNotes(), HttpStatus.OK);
 	}
 
+	//----------------Read Entire Details Of All The Notes------------
+	
+	@GetMapping("/readAllNotes")
+	public ResponseEntity<List<NoteDTO>> readAllNotes() throws NullEntryException, NoteNotFoundException, NoteCreationException, UserNotFoundException {
+
+		 noteService.readAllNotes();
+		/*Response response = new Response();
+
+		response.setMessage("The details are fetched for all the notes,you can kindly have a look");
+		response.setStatus(5);*/
+
+		return new ResponseEntity<>(noteService.readAllNotes(), HttpStatus.OK);
+	}
+
 	// ----------Read A Particular Note-------------------------------
 
-	@GetMapping("/readOne")
-	public ResponseEntity<ViewDTO> readParticularNote(@RequestParam String token, @RequestParam String noteId,
+	@PostMapping("/readOne/{noteId}")
+	public ResponseEntity<ViewDTO> readParticularNote(@RequestParam String token, @PathVariable("noteId") String noteId,
 			@RequestParam String userId) throws UserNotFoundException, NoteNotFoundException  {
 
 		 noteService.findNoteById(token, noteId, userId);
@@ -134,9 +147,9 @@ public class NoteController {
 
 	// ---------Add A Reminder To A Particular Note---------------------
 
-	@RequestMapping(value = "/addReminder", method = RequestMethod.POST)
+	@RequestMapping(value = "/addReminder/{noteId}", method = RequestMethod.POST)
 	public ResponseEntity<Response> addNoteReminder(@RequestParam String token, @RequestParam String userId,
-			@RequestParam Date date, @RequestParam String noteId) throws NoteCreationException, UserNotFoundException, NoteNotFoundException {
+			@RequestParam Date date, @PathVariable String noteId) throws NoteCreationException, UserNotFoundException, NoteNotFoundException {
 
 		noteService.addReminder(token, userId, date, noteId);
 
@@ -150,9 +163,9 @@ public class NoteController {
 
 	// -------Delete Reminder From A Note---------------------------------
 
-	@RequestMapping(value = "/deleteReminder", method = RequestMethod.POST)
+	@RequestMapping(value = "/deleteReminder/{noteId}", method = RequestMethod.POST)
 	public ResponseEntity<Response> deleteNoteReminder(@RequestParam String token, @RequestParam String userId,
-			@RequestParam Date date, @RequestParam String noteId) throws NullEntryException, UserNotFoundException, NoteNotFoundException {
+			@RequestParam Date date, @PathVariable String noteId) throws NullEntryException, UserNotFoundException, NoteNotFoundException {
 
 		noteService.deleteReminder(token, userId, date, noteId);
 

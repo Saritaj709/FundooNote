@@ -31,11 +31,9 @@ public class NoteServiceImpl implements NoteService{
 	
 	@Autowired
 	ModelMapper modelMapper;
-	
-	// List<ViewDTO> noteList=new LinkedList<>();
 
 	@Override
-	public ViewDTO createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException {
+	public void createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException {
 		
 		String parsed=jwtToken.parseJwtToken(token);	
 		String userId=create.getUserId();
@@ -53,17 +51,7 @@ public class NoteServiceImpl implements NoteService{
 			noteDto.setSetReminder(null);
 			noteDto.setLastModifiedAt(new Date());
 			noteRepository.save(noteDto);
-			
-			ViewDTO viewNote=modelMapper.map(create,ViewDTO.class);
-			viewNote.setCreatedAt(new Date());
-			viewNote.setSetReminder(null);
-			viewNote.setLastModifiedAt(new Date());
-			
-			//noteRepository.save(viewNote);
-			
-			 //noteList.add(viewNote);
-			 
-			return viewNote;
+		
 	}
 
 	@Override
@@ -82,8 +70,11 @@ public class NoteServiceImpl implements NoteService{
 	    }
 	    
 	   NoteDTO note=modelMapper.map(update,NoteDTO.class);
+	   
 	   note.setCreatedAt(new Date());
 		note.setLastModifiedAt(new Date());
+	    note.setSetReminder(null);
+	    
 		noteRepository.save(note);
 	}
 
@@ -97,12 +88,14 @@ public class NoteServiceImpl implements NoteService{
 	    }
 		
 		Optional<NoteDTO>checkNote=noteRepository.findById(noteId);
+		
 	    if(!checkNote.isPresent()) {
 	    	throw new NoteNotFoundException("The note with given id does not exist");
 	    }
 	    
 	    checkNote.get().setTrashed(true);
 	    noteRepository.save(checkNote.get());
+	    
 	    return true;
 	}
 
@@ -118,13 +111,32 @@ public class NoteServiceImpl implements NoteService{
 	}
 
 	@Override
-	public List<NoteDTO> readNotes() throws NullEntryException {
+	public List<ViewDTO> readNotes() throws NullEntryException {
+		
 		List<NoteDTO> noteList=noteRepository.findAll();
+		
 		if(noteList==null) {
 			throw new NullEntryException("There is no any details stored in note yet");
 		}
+				
+		List<ViewDTO> viewList=new LinkedList<>();
 		
-		return noteList;
+		for(int index=0;index<noteList.size();index++) {
+			
+			ViewDTO viewDto=new ViewDTO();
+			
+			viewDto.setCreatedAt(noteList.get(index).getCreatedAt());
+			viewDto.setDescription(noteList.get(index).getDescription());
+			viewDto.setTitle(noteList.get(index).getTitle());
+			viewDto.setSetReminder(noteList.get(index).getSetReminder());
+			viewDto.setTestColor(noteList.get(index).getTestColor());
+			viewDto.setTrashed(noteList.get(index).isTrashed());
+			viewDto.setLabel(noteList.get(index).getLabel());
+			viewDto.setLastModifiedAt(noteList.get(index).getLastModifiedAt());
+			viewList.add(viewDto);
+		}
+		
+		return viewList;
 	}
 	
 	
@@ -143,12 +155,18 @@ public class NoteServiceImpl implements NoteService{
 			throw new NoteNotFoundException("the note with given id does not exist");
 		}
 	
-		ViewDTO viewNote=modelMapper.map(checkNote,ViewDTO.class);
-		viewNote.setCreatedAt(new Date());
-		viewNote.setSetReminder(null);
-		viewNote.setLastModifiedAt(new Date());
+		ViewDTO viewDto=modelMapper.map(checkNote,ViewDTO.class);
 		
-		return viewNote;
+		viewDto.setCreatedAt(checkNote.get().getCreatedAt());
+		viewDto.setDescription(checkNote.get().getDescription());
+		viewDto.setTitle(checkNote.get().getTitle());
+		viewDto.setSetReminder(checkNote.get().getSetReminder());
+		viewDto.setTestColor(checkNote.get().getTestColor());
+		viewDto.setTrashed(checkNote.get().isTrashed());
+		viewDto.setLabel(checkNote.get().getLabel());
+		viewDto.setLastModifiedAt(checkNote.get().getLastModifiedAt());
+		
+		return viewDto;
 	}
 	
 	@Override

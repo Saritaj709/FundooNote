@@ -1,4 +1,4 @@
-package com.bridgelabz.fundonotes.confirmation;
+package com.bridgelabz.fundonotes.configurations;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.context.annotation.Bean;

@@ -1,7 +1,6 @@
 package com.bridgelabz.fundonotes.note.model;
 
 import java.io.Serializable;
-import java.util.Date;
 
 public class UpdateDTO implements Serializable {
 
@@ -20,7 +19,7 @@ public class UpdateDTO implements Serializable {
 	String noteId;
 	String label;
 	String testColor;
-	Date setReminder;
+	//Date setReminder;
 
 	public String getTitle() {
 		return title;
@@ -54,14 +53,6 @@ public class UpdateDTO implements Serializable {
 		this.testColor = testColor;
 	}
 
-	public Date getSetReminder() {
-		return setReminder;
-	}
-
-	public void setSetReminder(Date setReminder) {
-		this.setReminder = setReminder;
-	}
-
 	public String getUserId() {
 		return userId;
 	}
@@ -81,7 +72,7 @@ public class UpdateDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "UpdateDTO [title=" + title + ", description=" + description + ", userId=" + userId + ", noteId="
-				+ noteId + ", label=" + label + ", testColor=" + testColor + ", setReminder=" + setReminder + "]";
+				+ noteId + ", label=" + label + ", testColor=" + testColor + "]";
 	}
 
 }
