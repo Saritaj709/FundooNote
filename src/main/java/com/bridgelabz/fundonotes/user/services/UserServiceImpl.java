@@ -48,10 +48,10 @@ public class UserServiceImpl implements UserService {
 
 		UserUtility.validateUser(dto);
 
-		Optional<User> checkUser = userRepository.findByEmail(dto.getEmail());
+		Optional<User> checkUser = userRepository.findById(dto.getId());
 
 		if (checkUser.isPresent()) {
-			throw new RegistrationException("email id already exists,unable to register");
+			throw new RegistrationException("User id already exists,unable to register");
 
 		}
 		User user = new User();
@@ -62,14 +62,14 @@ public class UserServiceImpl implements UserService {
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		userRepository.insert(user);
 
-		String jwt = jwtToken.tokenGenerator(dto.getEmail());
+		String jwt = jwtToken.tokenGenerator(user.getId());
 		
 		jwtToken.parseJwtToken(jwt);
 
 		MailDTO mail = new MailDTO();
 		mail.setTo(dto.getEmail());
 		mail.setSubject("Account activation mail");
-		mail.setText("Click here to verify your account:\n\n" + "http://192.168.0.73:8080/user/activateaccount/?"
+		mail.setText("Click here to verify your account:\n\n" + "http://192.168.0.73:8080/user/activateaccount/?token="
 				+ jwt);
 		producer.sender(mail);
 
@@ -77,9 +77,9 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void getUserByEmail(String email) {
+	public void getUserById(String id) {
 
-		Optional<User> checkUser = userRepository.findByEmail(email);
+		Optional<User> checkUser = userRepository.findById(id);
 		if (!checkUser.isPresent()) {
 			throw new LoginException("User is not available");
 		}
@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
 
 		UserUtility.validateLogin(loginDto);
 
-		Optional<User> checkUser = userRepository.findByEmail(loginDto.getEmail());
+		Optional<User> checkUser = userRepository.findById(loginDto.getId());
 
 		if (!checkUser.isPresent()) {
 			throw new LoginException("This Email id does not exist");
@@ -104,7 +104,7 @@ public class UserServiceImpl implements UserService {
 			throw new LoginException("Password unmatched");
 		}
 
-		String jwt = jwtToken.tokenGenerator(loginDto.getEmail());
+		String jwt = jwtToken.tokenGenerator(loginDto.getId());
 		return jwt;
 
 	}
@@ -114,9 +114,9 @@ public class UserServiceImpl implements UserService {
 
 		UserUtility.validateEmail(user.getEmail());
 
-		Optional<User> checkUser = userRepository.findByEmail(user.getEmail());
+		Optional<User> checkUser = userRepository.findById(user.getId());
 		if (!checkUser.isPresent()) {
-			throw new LoginException("Email id does not exist");
+			throw new LoginException("User id does not exist");
 		}
 
 		user.setEmail(checkUser.get().getEmail());
@@ -133,14 +133,14 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public boolean deleteUser(String email) {
+	public void deleteUser(String id) {
 
-		Optional<User> checkUser = userRepository.findByEmail(email);
-		if (checkUser.isPresent()) {
-			userRepository.deleteById(email);
-			return true;
+		Optional<User> checkUser = userRepository.findById(id);
+		if (!checkUser.isPresent()) {
+			throw new LoginException("User not found");
 		}
-		return false;
+		userRepository.deleteById(id);
+		
 	}
 
 	@Override
@@ -155,16 +155,34 @@ public class UserServiceImpl implements UserService {
 		return true;
 	}
 
+	
 	@Override
-	public void forgetPassword(String email) {
+	public boolean activate(String token,String id) {
 
-		Optional<User> user = userRepository.findByEmail(email);
+		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary("Sarita")).parseClaimsJws(token)
+				.getBody();
+
+		Optional<User> user = userRepository.findById(claims.getSubject());
+		
+		if(!claims.getSubject().equals(id)) {
+			throw new LoginException("User not found");
+		}
+		
+		user.get().setActivate(true);
+		userRepository.save(user.get());
+		return true;
+	}
+
+	@Override
+	public void forgetPassword(String id,String email) {
+
+		Optional<User> user = userRepository.findById(id);
 
 		if (!user.isPresent()) {
 			throw new LoginException("User is not present");
 		}
 
-		String generatedToken = jwtToken.tokenGenerator(email);
+		String generatedToken = jwtToken.tokenGenerator(id);
 		System.out.println(generatedToken);
 
 		MailDTO mail = new MailDTO();
@@ -184,7 +202,7 @@ public class UserServiceImpl implements UserService {
 				.getBody();
 		System.out.println("Subject : " + claims.getSubject());
 
-		Optional<User> user = userRepository.findById(claims.getSubject());
+		Optional<User> user = userRepository.findByEmail(claims.getSubject());
 
 		if (!user.isPresent()) {
 			throw new Exception("User not found");

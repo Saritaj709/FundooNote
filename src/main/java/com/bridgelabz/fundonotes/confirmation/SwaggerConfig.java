@@ -1,4 +1,4 @@
-package com.bridgelabz.fundonotes.user.confirmation;
+package com.bridgelabz.fundonotes.confirmation;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

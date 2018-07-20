@@ -17,8 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
-import com.bridgelabz.fundonotes.note.model.NoteDTO;
 import com.bridgelabz.fundonotes.note.model.Response;
+import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.services.NoteService;
 
 @RestController
@@ -46,8 +46,8 @@ public class NoteController {
 
 	// ------------Update An Existing Note-------------------
 
-	@PutMapping("/update")
-	public ResponseEntity<Response> updateNote(@RequestParam String token, @RequestBody NoteDTO update,
+	@PutMapping(value="/update")
+	public ResponseEntity<Response> updateNote(@RequestParam String token, @RequestBody UpdateDTO update,
 			@RequestParam String noteId) throws NoteCreationException {
 
 		noteService.updateNote(token, update, noteId);
@@ -63,7 +63,7 @@ public class NoteController {
 	// ------------Move An Existing Note To Trash---------------
 
 	@PostMapping("/trash")
-	public ResponseEntity<Response> moveNoteToTrash(@RequestParam String token, @RequestParam String userId,
+	public ResponseEntity<Response> moveNoteToTrash(@RequestParam String token, @RequestParam String userId,@RequestParam
 			String noteId) throws NoteCreationException {
 
 		noteService.moveNoteToTrash(token, userId, noteId);
@@ -78,7 +78,7 @@ public class NoteController {
 
 	// ----------Delete An Existing Note From Trash--------------
 
-	@DeleteMapping("/delete")
+	@DeleteMapping(value="/delete")
 	public ResponseEntity<Response> deleteNote(@RequestParam String token, @RequestParam String userId,
 			@RequestParam String noteId) throws NoteCreationException {
 

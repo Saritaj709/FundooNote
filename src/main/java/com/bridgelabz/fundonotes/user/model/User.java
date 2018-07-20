@@ -15,20 +15,28 @@ public class User implements Serializable {
 	private static final long serialVersionUID = 1L;
 	
 	@Id
-	private String email;
+	private String id;
+	
 	private String firstname;
 	private String lastname;
 	private String phoneNo;
+	private String email;
 	private String password;
 	private boolean activate;
 	public User() {
 		super();
 	}
+	
+	
+	public String getId() {
+		return id;
+	}
 
-	/*public User(String string, boolean b) {
-		// TODO Auto-generated constructor stub
-		return;
-	}*/
+
+	public void setId(String id) {
+		this.id = id;
+	}
+
 
 	public String getEmail() {
 		return email;

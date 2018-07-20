@@ -59,6 +59,22 @@ public class UserController {
 			return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
 		}
 	}
+	
+	//----------------Activate USer Using RequestParam------------
+	
+	@RequestMapping(value = "/activate", method = RequestMethod.GET)
+	public ResponseEntity<ResponseDTO> activateAcc(@RequestParam(value="token") String token,@RequestParam(value="id") String id) throws RegistrationException {
+
+		userService.activate(token,id);
+		
+		ResponseDTO response = new ResponseDTO();
+
+			response.setMessage("Account activated successfully");
+			response.setStatus(1);
+
+			return new ResponseEntity<>(response, HttpStatus.OK);
+	
+	}
 
 	//-----------------------Registration------------------------
 	
@@ -68,7 +84,7 @@ public class UserController {
 		userService.saveUser(user);
 
 		ResponseDTO response = new ResponseDTO();
-		response.setMessage("User with email " + user.getEmail() + " registered successfully");
+		response.setMessage("User with id " + user.getId() + " registered successfully");
 		response.setStatus(1);
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
@@ -77,20 +93,13 @@ public class UserController {
 	//------------------------Delete a User-------------------
 	
 	@RequestMapping(value = "/delete", method = RequestMethod.DELETE)
-	public ResponseEntity<ResponseDTO> deleteUser(@RequestBody User user) {
+	public ResponseEntity<ResponseDTO> deleteUser(@RequestParam String id) {
 
 		ResponseDTO response = new ResponseDTO();
+		
+		userService.deleteUser(id);
 
-		/*if (userService.getUserByEmail(user.getEmail()) == false) {
-
-			response.setMessage("User with email " + user.getEmail() + " exists");
-			response.setStatus(-1);
-
-			return new ResponseEntity<>(response, HttpStatus.CONFLICT);
-		}*/
-		userService.deleteUser(user.getEmail());
-
-		response.setMessage("User with email " + user.getEmail() + " successfully deleted");
+		response.setMessage("User with id " + id + " successfully deleted");
 		response.setStatus(1);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -104,7 +113,7 @@ public class UserController {
 		userService.updateUser(user);
 
 		ResponseDTO response = new ResponseDTO();
-		response.setMessage("User with email " + user.getEmail() + " successfully updated");
+		response.setMessage("User with id " + user.getId() + " successfully updated");
 		response.setStatus(1);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -116,7 +125,7 @@ public class UserController {
 		userService.loginUser(user);
 
 		ResponseDTO response = new ResponseDTO();
-		response.setMessage("User with email " + user.getEmail() + ", Sucessfully logged in");
+		response.setMessage("User with id " + user.getId() + ", Sucessfully logged in");
 		response.setStatus(2);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
@@ -125,9 +134,9 @@ public class UserController {
 	//-----------------------Forgot password------------------------
 	
 	@RequestMapping(value = "/forgotpassword", method = RequestMethod.POST)
-	public ResponseEntity<ResponseDTO> forgetPassword(@RequestParam(value = "email") String email) {
+	public ResponseEntity<ResponseDTO> forgetPassword(@RequestParam(value="id") String id,@RequestParam(value = "email") String email) {
 
-		userService.forgetPassword(email);
+		userService.forgetPassword(id,email);
 
 		ResponseDTO response = new ResponseDTO();
 		response.setMessage("link sent to email,pls check and verify");

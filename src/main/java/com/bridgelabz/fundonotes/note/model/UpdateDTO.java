@@ -17,6 +17,7 @@ public class UpdateDTO implements Serializable {
 	String userId;
 	// @ApiModelProperty(hidden = true)
 	// Date lastModifiedAt;
+	String noteId;
 	String label;
 	String testColor;
 	Date setReminder;
@@ -69,10 +70,18 @@ public class UpdateDTO implements Serializable {
 		this.userId = userId;
 	}
 
+	public String getNoteId() {
+		return noteId;
+	}
+
+	public void setNoteId(String noteId) {
+		this.noteId = noteId;
+	}
+
 	@Override
 	public String toString() {
-		return "UpdateDTO [title=" + title + ", description=" + description + ", userId=" + userId + ", label=" + label
-				+ ", testColor=" + testColor + ", setReminder=" + setReminder + "]";
+		return "UpdateDTO [title=" + title + ", description=" + description + ", userId=" + userId + ", noteId="
+				+ noteId + ", label=" + label + ", testColor=" + testColor + ", setReminder=" + setReminder + "]";
 	}
 
 }

@@ -13,18 +13,20 @@ public interface UserService {
 
 	public String saveUser(RegistrationDTO user) throws RegistrationException;
 
-	public void getUserByEmail(String email);
+	public void getUserById(String id);
 
 	public String loginUser(LoginDTO loginDto);
 
 	public String updateUser(User user);
 
-	public boolean deleteUser(String email);
+	public void deleteUser(String email);
 
 	public boolean activateJwt(String token);
 
-	public void forgetPassword(String email);
+	public void forgetPassword(String id,String email);
 	
 	public void passwordReset(String token,PasswordDTO dto) throws RegistrationException, Exception;
+
+	boolean activate(String token, String id);
 
 }

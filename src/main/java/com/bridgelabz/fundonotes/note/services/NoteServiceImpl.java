@@ -4,12 +4,14 @@ import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.NoteDTO;
+import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.utility.NoteUtility;
 
 @Service
@@ -20,55 +22,54 @@ public class NoteServiceImpl implements NoteService{
 	
 	@Autowired
 	Token jwtToken;
+	
+	@Autowired
+	ModelMapper modelMapper;
 
 	@Override
-	public void createNote(String token,CreateDTO note) throws NoteCreationException {
+	public void createNote(String token,CreateDTO create) throws NoteCreationException {
 		
 		String parsed=jwtToken.parseJwtToken(token);	
-		String userId=note.getUserId();
+		String userId=create.getUserId();
 		if(!parsed.equals(userId)) {
 	    	throw new NoteCreationException("Please enter valid token to match your account");
 	    }
+	
+		NoteUtility.validateNoteCreation(create);
 		
-		NoteUtility.validateNoteCreation(note);
-			    
-			NoteDTO noteDto=new NoteDTO();
-			noteDto.setUserId(note.getUserId());
+		NoteDTO noteDto=modelMapper.map(create,NoteDTO.class);
+		
+			noteDto.setUserId(parsed);
 			noteDto.setCreatedAt(new Date());
-			noteDto.setDescription(note.getDescription());
-			noteDto.setLabel(note.getLabel());
-			noteDto.setTestColor(note.getTestColor());
-			noteDto.setTitle(note.getTitle());
-			noteDto.setSetReminder(note.getSetReminder());
+			noteDto.setSetReminder(null);
 			noteDto.setLastModifiedAt(new Date());
 			noteRepository.save(noteDto);
 	}
 
 	@Override
-	public void updateNote(String token,NoteDTO note,String noteId) throws NoteCreationException {
+	public void updateNote(String token,UpdateDTO update,String noteId) throws NoteCreationException {
 
 		String parsed=jwtToken.parseJwtToken(token);	
-		String userId=note.getUserId();
+		String userId=update.getUserId();
 		
 		if(!parsed.equals(userId)) {
 	    	throw new NoteCreationException("Please enter valid token to match your account");
 	    }
 		
-		Optional<NoteDTO>checkNote=noteRepository.findById(note.getNoteId());
+		Optional<NoteDTO>checkNote=noteRepository.findById(update.getNoteId());
 	    if(!checkNote.isPresent()) {
 	    	throw new NoteCreationException("The note with given id does not exist");
 	    }
 	    
-		note.setTestColor(checkNote.get().getTestColor());
-		note.setLabel(checkNote.get().getLabel());
-		note.setTitle(checkNote.get().getTitle());
-		note.setSetReminder(checkNote.get().getSetReminder());
-		note.setDescription(checkNote.get().getDescription());
+	   NoteDTO note=modelMapper.map(update,NoteDTO.class);
+	   note.setCreatedAt(new Date());
+		note.setLastModifiedAt(new Date());
 		noteRepository.save(note);
 	}
 
 	@Override
 	public boolean moveNoteToTrash(String token,String userId,String noteId) throws NoteCreationException {
+	
 		String parsed=jwtToken.parseJwtToken(token);	
 		
 		if(!parsed.equals(userId)) {
@@ -86,13 +87,14 @@ public class NoteServiceImpl implements NoteService{
 	}
 
 	@Override
-	public void readAllNotes() throws NoteCreationException {
+	public List<NoteDTO> readAllNotes() throws NoteCreationException {
 		
 		List<NoteDTO> noteList = noteRepository.findAll();
 		
 		if(noteList==null) {
 			throw new NoteCreationException("There is no any details stored in note yet");
 		}
+		return noteList;
 	}
 
 	@Override
@@ -109,6 +111,7 @@ public class NoteServiceImpl implements NoteService{
 		if(!checkNote.isPresent()) {
 			throw new NoteCreationException("the note with given id does not exist");
 		}
+		noteRepository.findById(noteId);
 		return true;
 	}
 	@Override
@@ -136,7 +139,7 @@ public class NoteServiceImpl implements NoteService{
 
 	@Override
 	public boolean addReminder(String token,String userId,Date date,String noteId) throws NoteCreationException {
-/*String parsed=jwtToken.parseJwtToken(token);	
+String parsed=jwtToken.parseJwtToken(token);	
 		
 		if(!parsed.equals(userId)) {
 	    	throw new NoteCreationException("Please enter valid token to match your account");
@@ -146,10 +149,10 @@ public class NoteServiceImpl implements NoteService{
 		
 		if(!checkNote.isPresent()) {
 			throw new NoteCreationException("the note with given id does not exist");
-		}*/
-		findNoteById(token,userId,noteId);
+		}
+		//findNoteById(token,userId,noteId);
 		
-		Optional<NoteDTO>checkNote=noteRepository.findById(noteId);
+		//Optional<NoteDTO>checkNote=noteRepository.findById(noteId);
 		 checkNote.get().setSetReminder(date);
 		 noteRepository.save(checkNote.get());
 		return true;
@@ -158,7 +161,7 @@ public class NoteServiceImpl implements NoteService{
 
 	@Override
 	public void deleteReminder(String token,String userId,Date date,String noteId) throws NoteCreationException {
-/*String parsed=jwtToken.parseJwtToken(token);	
+String parsed=jwtToken.parseJwtToken(token);	
 		
 		if(!parsed.equals(userId)) {
 	    	throw new NoteCreationException("Please enter valid token to match your account");
@@ -168,11 +171,11 @@ public class NoteServiceImpl implements NoteService{
 		
 		if(!checkNote.isPresent()) {
 			throw new NoteCreationException("the note with given id does not exist");
-		}*/
+		}
 		if(!addReminder(token,userId,date,noteId)) {
 			throw new NoteCreationException("There is no reminder for the note yet");
 		}
-		Optional<NoteDTO>checkNote=noteRepository.findById(noteId);
+		//Optional<NoteDTO>checkNote=noteRepository.findById(noteId);
 		 checkNote.get().setSetReminder(null);
 		 noteRepository.save(checkNote.get());
 	}
