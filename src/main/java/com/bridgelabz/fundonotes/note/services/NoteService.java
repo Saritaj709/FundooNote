@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
+import com.bridgelabz.fundonotes.note.exception.NoteTrashedException;
 import com.bridgelabz.fundonotes.note.exception.NullEntryException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
 import com.bridgelabz.fundonotes.note.exception.UserNotFoundException;
@@ -16,19 +17,22 @@ import com.bridgelabz.fundonotes.note.model.ViewDTO;
 public interface NoteService {
 	void createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException;
 
-	void updateNote(String token,UpdateDTO update,String noteId) throws NoteNotFoundException, UserNotFoundException;
+	void updateNote(String token,UpdateDTO update,String noteId) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException;
 
-	boolean moveNoteToTrash(String token,String userId,String noteId) throws NoteNotFoundException, UserNotFoundException;
+	boolean trashNote(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
 
 	List<NoteDTO> readAllNotes() throws NullEntryException;
 	
-	ViewDTO findNoteById(String token,String noteId,String userId) throws UserNotFoundException, NoteNotFoundException;
+	ViewDTO findNoteById(String token,String noteId) throws UserNotFoundException, NoteNotFoundException, NoteTrashedException;
 
-	void deleteNote(String token,String userId,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException;
+	void deleteNoteForever(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
 
-	boolean addReminder(String token,String userId,Date date,String noteId) throws UserNotFoundException, NoteNotFoundException;
+	boolean addReminder(String token,Date date,String noteId) throws UserNotFoundException, NoteNotFoundException, NoteTrashedException;
 
-	void deleteReminder(String token,String userId,Date date,String noteId) throws NullEntryException, UserNotFoundException, NoteNotFoundException;
+	void deleteReminder(String token,String noteId) throws NullEntryException, UserNotFoundException, NoteNotFoundException, NoteTrashedException;
 
 	List<ViewDTO> readNotes() throws NullEntryException, NoteNotFoundException, NoteCreationException, UserNotFoundException;
+
+	void restoreNote(String token, String noteId)
+			throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
 }

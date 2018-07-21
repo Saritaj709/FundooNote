@@ -12,27 +12,32 @@ import org.springframework.web.servlet.ModelAndView;
 
 @Component
 public class LoggerInterceptor implements HandlerInterceptor {
-	
-	Logger logger=org.slf4j.LoggerFactory.getLogger(this.getClass());
-	
+
+	Logger logger = org.slf4j.LoggerFactory.getLogger(this.getClass());
+
 	@Override
-	public void afterCompletion(HttpServletRequest request,HttpServletResponse response,Object object,Exception arg3)throws Exception
-	{
-		String requestId=UUID.randomUUID().toString();
-		request.setAttribute("reqId",requestId);
-		logger.info("Request completed for "+request.getRequestURI()+" with request id "+requestId);
-	}
-	@Override
-	public void postHandle(HttpServletRequest request,HttpServletResponse response,Object object,ModelAndView model)throws Exception {
-	    String requestId=UUID.randomUUID().toString();
-	    request.setAttribute("reqId",requestId);
-		logger.info("Method executed for "+request.getRequestURI()+" with request id "+requestId);
-	}
-	@Override
-	public boolean preHandle(HttpServletRequest request,HttpServletResponse response,Object object)throws Exception {
-		String requestId=UUID.randomUUID().toString();
-		request.setAttribute("reqId",requestId);
-		logger.info("Before process request is called for "+request.getRequestURI()+" with request id "+requestId);
+	public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object object) throws Exception {
+		String requestId = UUID.randomUUID().toString();
+		request.setAttribute("reqId", requestId);
+		logger.info(
+				"Before process request is called for " + request.getRequestURI() + " with request id " + requestId);
 		return true;
 	}
+
+	@Override
+	public void postHandle(HttpServletRequest request, HttpServletResponse response, Object object, ModelAndView model)
+			throws Exception {
+		String requestId = UUID.randomUUID().toString();
+		request.setAttribute("reqId", requestId);
+		logger.info("Method executed for " + request.getRequestURI() + " with request id " + requestId);
+	}
+
+	@Override
+	public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object object, Exception arg3)
+			throws Exception {
+		String requestId = UUID.randomUUID().toString();
+		request.setAttribute("reqId", requestId);
+		logger.info("Request completed for " + request.getRequestURI() + " with request id " + requestId);
+	}
+
 }

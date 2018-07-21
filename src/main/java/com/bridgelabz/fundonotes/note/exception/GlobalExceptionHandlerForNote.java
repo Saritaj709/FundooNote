@@ -52,11 +52,29 @@ public class GlobalExceptionHandlerForNote {
 	}
 	
 	@ExceptionHandler(UntrashedException.class)
-	public ResponseEntity<Response> untrashedExceptionHandler(NullEntryException e) {
+	public ResponseEntity<Response> untrashedExceptionHandler(UntrashedException e) {
 		logger.error("note untrashed error");
 		Response response = new Response();
 		response.setMessage("note untrashed exception, " + e.getMessage());
 		response.setStatus(401);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NoteTrashedException.class)
+	public ResponseEntity<Response> trashedNoteExceptionHandler(NoteTrashedException e) {
+		logger.error("note trashed error");
+		Response response = new Response();
+		response.setMessage("note trashed exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NoRemiderToSetException.class)
+	public ResponseEntity<Response> noReminderToSetExceptionHandler(NoRemiderToSetException e) {
+		logger.error("no reminder to set error");
+		Response response = new Response();
+		response.setMessage("no reminder to set exception, " + e.getMessage());
+		response.setStatus(501);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	/*@ExceptionHandler(Exception.class)

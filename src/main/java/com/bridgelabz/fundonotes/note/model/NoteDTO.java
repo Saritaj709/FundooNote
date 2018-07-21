@@ -16,7 +16,7 @@ public class NoteDTO implements Serializable {
 	 */
 	private static final long serialVersionUID = 1L;
 	@Id
-	String noteId;
+ 	String noteId;
 	String title;
 	String description;
 	//@ApiModelProperty(hidden = true)
@@ -26,8 +26,8 @@ public class NoteDTO implements Serializable {
 	//@ApiModelProperty(hidden = true)
 	Date lastModifiedAt;
 	String label;
-	String testColor;
-	Date setReminder;
+	String color="white";
+	Date setReminder=null;
 	boolean isTrashed;
 
 	public NoteDTO() {
@@ -90,12 +90,12 @@ public class NoteDTO implements Serializable {
 		this.label = label;
 	}
 
-	public String getTestColor() {
-		return testColor;
+	public String getColor() {
+		return color;
 	}
 
-	public void setTestColor(String testColor) {
-		this.testColor = testColor;
+	public void setColor(String testColor) {
+		this.color = testColor;
 	}
 
 	public Date getSetReminder() {
@@ -118,7 +118,7 @@ public class NoteDTO implements Serializable {
 	public String toString() {
 		return "NoteDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
 				+ createdAt + ", userId=" + userId + ", lastModifiedAt=" + lastModifiedAt + ", label=" + label
-				+ ", testColor=" + testColor + ", setReminder=" + setReminder + "]";
+				+ ", testColor=" + color + ", setReminder=" + setReminder + "]";
 	}
 
 }
