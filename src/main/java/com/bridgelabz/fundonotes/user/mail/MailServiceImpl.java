@@ -10,7 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundonotes.user.model.MailDTO;
-import com.bridgelabz.fundonotes.user.services.UserRepository;
+import com.bridgelabz.fundonotes.user.repository.UserRepository;
 
 @Service
 public class MailServiceImpl implements MailService {

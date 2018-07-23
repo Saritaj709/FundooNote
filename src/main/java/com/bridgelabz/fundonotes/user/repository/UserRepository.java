@@ -1,4 +1,4 @@
-package com.bridgelabz.fundonotes.user.services;
+package com.bridgelabz.fundonotes.user.repository;
 
 import java.util.Optional;
 
@@ -10,4 +10,6 @@ import com.bridgelabz.fundonotes.user.model.User;
 @Repository
 public interface UserRepository extends MongoRepository<User, String> {
 public Optional<User> findByEmail(String email);
+
+public void deleteByEmail(String email);
 }

@@ -17,7 +17,7 @@ import com.bridgelabz.fundonotes.note.model.ViewDTO;
 public interface NoteService {
 	void createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException;
 
-	void updateNote(String token,UpdateDTO update,String noteId) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException;
+	void updateNote(String token,UpdateDTO update) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException;
 
 	boolean trashNote(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
 

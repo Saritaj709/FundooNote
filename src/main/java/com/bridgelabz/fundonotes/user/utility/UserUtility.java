@@ -29,8 +29,8 @@ public class UserUtility {
 	}
 
 	public static void validateLogin(LoginDTO loginDto) throws LoginException {
-		if (loginDto.getId()==null) {
-			throw new LoginException("Id cannot be null");
+		if (!loginDto.getEmail().matches(EMAIL)) {
+			throw new LoginException("Email format is not valid");
 		}
 	}
 

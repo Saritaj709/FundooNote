@@ -9,7 +9,6 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.bridgelabz.fundonotes.note.exception.NoRemiderToSetException;
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
 import com.bridgelabz.fundonotes.note.exception.NoteTrashedException;
@@ -20,6 +19,7 @@ import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.NoteDTO;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.model.ViewDTO;
+import com.bridgelabz.fundonotes.note.repository.NoteRepository;
 import com.bridgelabz.fundonotes.note.utility.NoteUtility;
 
 @Service
@@ -61,7 +61,7 @@ public class NoteServiceImpl implements NoteService{
 	}
 
 	@Override
-	public void updateNote(String token,UpdateDTO updateDto,String noteId) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException {
+	public void updateNote(String token,UpdateDTO updateDto) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException {
 
 		String id=jwtToken.parseJwtToken(token);	
 		
@@ -84,6 +84,7 @@ public class NoteServiceImpl implements NoteService{
 		note.setLastModifiedAt(new Date());
 	    note.setSetReminder(null);
 	    note.setColor(checkNote.get().getColor());
+	    note.setUserId(checkNote.get().getUserId());
 	    
 		noteRepository.save(note);
 	}
@@ -99,10 +100,10 @@ public class NoteServiceImpl implements NoteService{
 	    
 	    String id=jwtToken.parseJwtToken(token);	
 	    
-	    if(!id.equals(checkNote.get().getUserId())) {
+	  /* if(!id.equals(checkNote.get().getUserId())) {
 	    	throw new UserNotFoundException("Please enter valid token to match your account");
 	    }
-	    
+	    */
 	    if(checkNote.get().isTrashed()) {
 	    	throw new NoteTrashedException("the note with given details is already trashed");
 	    }
@@ -124,9 +125,9 @@ public class NoteServiceImpl implements NoteService{
 			throw new NoteNotFoundException("The given note does not exist");
 		}
 		
-		if(!id.equals(checkNote.get().getUserId())) {
+	/*	if(!id.equals(checkNote.get().getUserId())) {
 	    	throw new UserNotFoundException("Please enter valid token to match your account");
-	    }
+	    }*/
 		
 		if(!checkNote.get().isTrashed()) {
 			throw new UntrashedException("Note is already restored,it is not trashed yet");		
@@ -215,15 +216,15 @@ public class NoteServiceImpl implements NoteService{
 	@Override
 	public void deleteNoteForever(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException {
 	
-		String id=jwtToken.parseJwtToken(token);	
-		
 		Optional<NoteDTO>checkNote=noteRepository.findByNoteId(noteId);
 		
 		if(!checkNote.isPresent()) {
 			throw new NoteNotFoundException("The given note does not exist");
 		}
 		
-		if(!id.equals(checkNote.get().getUserId())) {
+		String id=jwtToken.parseJwtToken(token);
+		
+		 if(!id.equals(checkNote.get().getUserId())) {
 	    	throw new UserNotFoundException("Please enter valid token to match your account");
 	    }
 		
@@ -231,7 +232,7 @@ public class NoteServiceImpl implements NoteService{
 			throw new UntrashedException("Note is not trashed yet");		
 		}
 		
-		noteRepository.deleteById(noteId);	
+		noteRepository.deleteByNoteId(noteId);	
 	}
 
 	@Override

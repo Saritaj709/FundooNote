@@ -32,6 +32,6 @@ public class JwtToken {
 				.getBody();
 		System.out.println("Subject : " + claims.getSubject());
 		System.out.println("ID : " + claims.getId());
-		return (claims.getId() + " " + claims.getSubject());
+		return claims.getSubject();
 	}
 }

@@ -34,10 +34,10 @@ public class GlobalExceptionHandlerForNote {
 	}
 	
 	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<Response> userNotFoundExceptionHandler(NoteNotFoundException e) {
-		logger.error("note not found error");
+	public ResponseEntity<Response> userNotFoundExceptionHandler(UserNotFoundException e) {
+		logger.error("User not found error");
 		Response response = new Response();
-		response.setMessage("note not found exception, " + e.getMessage());
+		response.setMessage("User not found exception, " + e.getMessage());
 		response.setStatus(301);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}

@@ -39,6 +39,15 @@ public class GlobalExceptionHandler {
 		response.setStatus(1103);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(ActivationException.class)
+	public ResponseEntity<ResponseDTO> activationExceptionHandler(ActivationException e){
+		logger.error("User account activation exception exception");
+		ResponseDTO response=new ResponseDTO();
+		response.setMessage("User account activation Exception, "+e.getMessage());
+		response.setStatus(1104);
+		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+	}
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {
 		logger.error("other exceptions");
