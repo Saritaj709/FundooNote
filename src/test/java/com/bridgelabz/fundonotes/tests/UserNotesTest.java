@@ -122,7 +122,7 @@ public class UserNotesTest{
 		
 		//@Test
 		public void noteAddReminderTest() throws Exception {
-			mockMvc.perform(MockMvcRequestBuilders.post("/api/notes/addReminder/{noteId}","5b55c8e61cace95939105613").contentType(MediaType.APPLICATION_JSON).header("token","eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzI0MTMzOTMsInN1YiI6IjViNTVhYzkxMWNhY2U5MmQ3YTUzZGQ2MSJ9.iKwYXsbaFz791y-9QtlrZI_3ew_vhoHxqarZYKbWPVk")
+			mockMvc.perform(MockMvcRequestBuilders.post("/api/notes/addReminder/{noteId}","5b55c8e61cace95939105613").contentType(MediaType.APPLICATION_JSON).header("token","eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzI0MTMzOTMsInN1YiI6IjViNTVhYzkxMWNhY2U5MmQ3YTUzZGQ2MSJ9.iKwYXsbaFz791y-9QtlrZI_3ew_vhoHxqarZYKbWPVk").param("date","2019/06/06")
 					.accept(MediaType.TEXT_PLAIN_VALUE))
 					.andExpect(jsonPath("$.message").value("Congratulations,your reminder is successfully set!!"))
 					.andExpect(jsonPath("$.status").value(7));
@@ -138,7 +138,7 @@ public class UserNotesTest{
 							.andExpect(jsonPath("$.status").value(9));
 				}
 
-				@Test
+				//@Test
 				public void noteDeleteForeverTest() throws Exception {
 					mockMvc.perform(MockMvcRequestBuilders.delete("/api/notes/deleteForever/{noteId}","5b55c8e61cace95939105613").contentType(MediaType.APPLICATION_JSON).header("token","eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzI0MTMzOTMsInN1YiI6IjViNTVhYzkxMWNhY2U5MmQ3YTUzZGQ2MSJ9.iKwYXsbaFz791y-9QtlrZI_3ew_vhoHxqarZYKbWPVk")
 							.accept(MediaType.TEXT_PLAIN_VALUE))

@@ -18,4 +18,6 @@ public interface NoteRepository extends MongoRepository<NoteDTO,String>{
 
 	void deleteByNoteId(String noteId);
 
+	Object findByUserId(String token);
+
 }

@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.note.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 public class CreateDTO implements Serializable {
 
@@ -13,7 +14,7 @@ public class CreateDTO implements Serializable {
 	String description;
 	String userId;
 
-	String label;
+	List<LabelDTO> label;
 	String color;
 
 	public String getTitle() {
@@ -40,11 +41,11 @@ public class CreateDTO implements Serializable {
 		this.userId = userId;
 	}
 
-	public String getLabel() {
+	public List<LabelDTO> getLabel() {
 		return label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(List<LabelDTO> label) {
 		this.label = label;
 	}
 

@@ -9,6 +9,8 @@ import springfox.documentation.builders.ApiInfoBuilder;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
+import springfox.documentation.swagger.web.ApiKeyVehicle;
+import springfox.documentation.swagger.web.SecurityConfiguration;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
 
 import static springfox.documentation.builders.PathSelectors.regex;
@@ -33,4 +35,9 @@ public class SwaggerConfig {
 				.termsOfServiceUrl("http://javainuse.com").contact("javainuse@gmail.com").license("JavaInUse License")
 				.licenseUrl("javainuse@gmail.com").version("1.0").build();
 	}
+	
+	/*@Bean
+	public SecurityConfiguration security() {
+		return new SecurityConfiguration(null,null,null,null,"token",ApiKeyVehicle.HEADER,"token","");
+	}*/
 }

@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.note.model;
 
 import java.util.Date;
+import java.util.List;
 
 public class ViewDTO {
 	String title;
@@ -10,10 +11,12 @@ public class ViewDTO {
 	// @ApiModelProperty(hidden = true)
 	// @ApiModelProperty(hidden = true)
 	Date lastModifiedAt;
-	String label;
+	List<LabelDTO> label;
 	String testColor;
 	Date setReminder;
 	boolean isTrashed;
+	boolean archieve;
+	boolean pin;
 
 	public ViewDTO() {
 		super();
@@ -51,11 +54,11 @@ public class ViewDTO {
 		this.lastModifiedAt = lastModifiedAt;
 	}
 
-	public String getLabel() {
+	public List<LabelDTO> getLabel() {
 		return label;
 	}
 
-	public void setLabel(String label) {
+	public void setLabel(List<LabelDTO> label) {
 		this.label = label;
 	}
 
@@ -83,11 +86,28 @@ public class ViewDTO {
 		this.isTrashed = isTrashed;
 	}
 
+	public boolean isArchieve() {
+		return archieve;
+	}
+
+	public void setArchieve(boolean archieve) {
+		this.archieve = archieve;
+	}
+
+	public boolean isPin() {
+		return pin;
+	}
+
+	public void setPin(boolean pin) {
+		this.pin = pin;
+	}
+
 	@Override
 	public String toString() {
 		return "ViewDTO [title=" + title + ", description=" + description + ", createdAt=" + createdAt
 				+ ", lastModifiedAt=" + lastModifiedAt + ", label=" + label + ", testColor=" + testColor
-				+ ", setReminder=" + setReminder + ", isTrashed=" + isTrashed + "]";
+				+ ", setReminder=" + setReminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
+				+ pin + "]";
 	}
 
 }

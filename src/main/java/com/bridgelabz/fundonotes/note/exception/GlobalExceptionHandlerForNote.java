@@ -77,6 +77,42 @@ public class GlobalExceptionHandlerForNote {
 		response.setStatus(501);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(NoteArchievedException.class)
+	public ResponseEntity<Response> noteArchievedExceptionHandler(NoteArchievedException e) {
+		logger.error("no reminder to set error");
+		Response response = new Response();
+		response.setMessage("no reminder to set exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NotePinnedException.class)
+	public ResponseEntity<Response> notePinnedExceptionHandler(NotePinnedException e) {
+		logger.error("no reminder to set error");
+		Response response = new Response();
+		response.setMessage("no reminder to set exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NoSuchLabelException.class)
+	public ResponseEntity<Response> noSuchLabelExceptionHandler(NoSuchLabelException e) {
+		logger.error("no label to set error");
+		Response response = new Response();
+		response.setMessage("no label available to set exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(LabelCreationException.class)
+	public ResponseEntity<Response> labelCreationExceptionHandler(LabelCreationException e) {
+		logger.error("no label to set error");
+		Response response = new Response();
+		response.setMessage("no label available to set exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {
 		logger.error("other exceptions");
