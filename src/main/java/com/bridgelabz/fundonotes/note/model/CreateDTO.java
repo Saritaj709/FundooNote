@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.note.model;
 
 import java.io.Serializable;
+import java.sql.Date;
 import java.util.List;
 
 public class CreateDTO implements Serializable {
@@ -12,10 +13,10 @@ public class CreateDTO implements Serializable {
 
 	String title;
 	String description;
-	String userId;
 
-	List<LabelDTO> label;
+	List<Label> label;
 	String color;
+	Date setReminder;
 
 	public String getTitle() {
 		return title;
@@ -33,19 +34,11 @@ public class CreateDTO implements Serializable {
 		this.description = description;
 	}
 
-	public String getUserId() {
-		return userId;
-	}
-
-	public void setUserId(String userId) {
-		this.userId = userId;
-	}
-
-	public List<LabelDTO> getLabel() {
+	public List<Label> getLabel() {
 		return label;
 	}
 
-	public void setLabel(List<LabelDTO> label) {
+	public void setLabel(List<Label> label) {
 		this.label = label;
 	}
 
@@ -56,11 +49,20 @@ public class CreateDTO implements Serializable {
 	public void setColor(String testColor) {
 		this.color = testColor;
 	}
+	
+
+	public Date getSetReminder() {
+		return setReminder;
+	}
+
+	public void setSetReminder(Date setReminder) {
+		this.setReminder = setReminder;
+	}
 
 	@Override
 	public String toString() {
-		return "CreateDTO [title=" + title + ", description=" + description + ", userId=" + userId + ", label=" + label
-				+ ", testColor=" + color + "]";
+		return "CreateDTO [title=" + title + ", description=" + description + ", label=" + label
+				+ ", color=" + color + ", setReminder=" + setReminder + "]";
 	}
 
 }

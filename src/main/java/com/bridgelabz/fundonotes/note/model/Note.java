@@ -12,7 +12,7 @@ import com.bridgelabz.fundonotes.note.repository.LabelRepository;
 
 @Document(collection = "notes")
 @Service
-public class NoteDTO implements Serializable {
+public class Note implements Serializable {
 
 	/**
 	 * 
@@ -33,9 +33,9 @@ public class NoteDTO implements Serializable {
 	boolean isTrashed;
 	boolean archieve;
 	boolean pin;
-	List<LabelDTO> Label;
+	List<Label> Label;
 
-	public NoteDTO() {
+	public Note() {
 		super();
 	}
 
@@ -127,11 +127,11 @@ public class NoteDTO implements Serializable {
 		this.pin = pinned;
 	}
 
-	public List<LabelDTO> getLabel() {
+	public List<Label> getLabel() {
 		return Label;
 	}
 
-	public void setLabel(List<LabelDTO> label) {
+	public void setLabel(List<Label> label) {
 		Label = label;
 	}
 

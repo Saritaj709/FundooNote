@@ -18,6 +18,6 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		
 		registry.addInterceptor(loggerInterceptor).addPathPatterns("/**");
-		registry.addInterceptor(notesInterceptor).addPathPatterns("/**");
+		registry.addInterceptor(notesInterceptor).addPathPatterns("/api/notes/**");
 	}
 }

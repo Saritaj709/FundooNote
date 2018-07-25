@@ -16,9 +16,7 @@ public class NoteUtility {
 		if(note.getLabel()==null) {
 			throw new NoteCreationException("note label should not be null");
 		}
-		if(note.getUserId()==null) {
-			throw new NoteCreationException("User id cannot be null");
-		}
+		
 	}
 
 	public static void validateNoteCreation(CreateLabelDTO createLabelDTO) throws NullEntryException {

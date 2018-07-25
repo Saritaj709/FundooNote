@@ -11,7 +11,7 @@ public class ViewDTO {
 	// @ApiModelProperty(hidden = true)
 	// @ApiModelProperty(hidden = true)
 	Date lastModifiedAt;
-	List<LabelDTO> label;
+	List<Label> label;
 	String testColor;
 	Date setReminder;
 	boolean isTrashed;
@@ -54,11 +54,11 @@ public class ViewDTO {
 		this.lastModifiedAt = lastModifiedAt;
 	}
 
-	public List<LabelDTO> getLabel() {
+	public List<Label> getLabel() {
 		return label;
 	}
 
-	public void setLabel(List<LabelDTO> label) {
+	public void setLabel(List<Label> label) {
 		this.label = label;
 	}
 

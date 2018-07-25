@@ -6,6 +6,7 @@ import org.springframework.context.annotation.Configuration;
 import com.google.common.base.Predicate;
 
 import springfox.documentation.builders.ApiInfoBuilder;
+import springfox.documentation.builders.PathSelectors;
 import springfox.documentation.service.ApiInfo;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
@@ -23,7 +24,7 @@ public class SwaggerConfig {
 	@Bean
 	public Docket postsApi() {
 		return new Docket(DocumentationType.SWAGGER_2).groupName("public-api").apiInfo(apiInfo()).select()
-				.paths(postPaths()).build();
+				.paths(PathSelectors.any()).build();
 	}
 
 	private Predicate<String> postPaths() {
@@ -36,8 +37,8 @@ public class SwaggerConfig {
 				.licenseUrl("javainuse@gmail.com").version("1.0").build();
 	}
 	
-	/*@Bean
+	@Bean
 	public SecurityConfiguration security() {
-		return new SecurityConfiguration(null,null,null,null,"token",ApiKeyVehicle.HEADER,"token","");
-	}*/
+		return new SecurityConfiguration(null,null,null,null,"token",ApiKeyVehicle.HEADER,"token",",");
+	}
 }

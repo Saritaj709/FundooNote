@@ -8,7 +8,7 @@ import org.springframework.stereotype.Service;
 
 @Document(collection="label")
 @Service
-public class LabelDTO implements Serializable{
+public class Label implements Serializable{
 	
 	/**
 	 * 
@@ -17,10 +17,9 @@ public class LabelDTO implements Serializable{
 	@Id
     String labelId;
     String labelName;
-    String noteId;
     String userId;
 	
-	public LabelDTO() {
+	public Label() {
 		super();
 	}
 
@@ -40,14 +39,6 @@ public class LabelDTO implements Serializable{
 		this.labelName = labelName;
 	}
 
-	public String getNoteId() {
-		return noteId;
-	}
-
-	public void setNoteId(String noteId) {
-		this.noteId = noteId;
-	}
-
 	public String getUserId() {
 		return userId;
 	}
@@ -58,7 +49,7 @@ public class LabelDTO implements Serializable{
 
 	@Override
 	public String toString() {
-		return "LabelDTO [labelId=" + labelId + ", labelName=" + labelName + ", noteId=" + noteId + ", userId=" + userId
+		return "LabelDTO [labelId=" + labelId + ", labelName=" + labelName + ", userId=" + userId
 				+ "]";
 	}
 	

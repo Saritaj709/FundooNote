@@ -10,7 +10,6 @@ public class CreateLabelDTO implements Serializable {
 	private static final long serialVersionUID = 1L;
 	private String labelName;
 	private String userId;
-	private String noteId;
 
 	public String getLabelName() {
 		return labelName;
@@ -28,17 +27,9 @@ public class CreateLabelDTO implements Serializable {
 		this.userId = userId;
 	}
 
-	public String getNoteId() {
-		return noteId;
-	}
-
-	public void setNoteId(String noteId) {
-		this.noteId = noteId;
-	}
-
 	@Override
 	public String toString() {
-		return "CreateLabelDTO [labelName=" + labelName + ", userId=" + userId + ", noteId=" + noteId + "]";
+		return "CreateLabelDTO [labelName=" + labelName + ", userId=" + userId + ", noteId=" + "]";
 	}
 
 }
