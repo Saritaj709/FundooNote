@@ -5,6 +5,7 @@ import org.springframework.stereotype.Repository;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.ViewDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.mongodb.repository.MongoRepository;
@@ -18,6 +19,10 @@ public interface NoteRepository extends MongoRepository<Note,String>{
 
 	void deleteByNoteId(String noteId);
 
-	Optional<Note> findByUserId(String token);
+	List<Note> findByUserId(String userId);
+
+	List<Note> findAllByUserId(String userId);
+
+	//List<Note> findByAllUserId(String userId);
 
 }

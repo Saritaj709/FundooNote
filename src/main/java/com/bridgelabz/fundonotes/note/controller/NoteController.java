@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bridgelabz.fundonotes.note.exception.DateException;
+import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.NoteArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
@@ -34,6 +36,7 @@ import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
+import com.bridgelabz.fundonotes.note.model.ViewDTO;
 import com.bridgelabz.fundonotes.note.services.NoteService;
 
 @RestController
@@ -48,9 +51,9 @@ public class NoteController {
 	@PostMapping(value = "/create")
 	public ResponseEntity<Note> createNote(HttpServletRequest req,
 			@RequestBody CreateDTO createDto)
-			throws NoteCreationException, NoteNotFoundException, UserNotFoundException {
+			throws NoteCreationException, NoteNotFoundException, UserNotFoundException, DateException {
 
-		String userId=(String) req.getAttribute("token");
+		String userId= (String) req.getAttribute("token");
 		
 		Note note=noteService.createNote(userId, createDto);
 
@@ -87,7 +90,7 @@ public class NoteController {
 	@PostMapping(value = "/addlabel/{noteId}")
 	public ResponseEntity<Response> addLabelToNotes(HttpServletRequest req,
 			@RequestParam(value = "labelName") String labelName, @PathVariable(value = "noteId") String noteId)
-			throws NoteNotFoundException, UserNotFoundException, NoteTrashedException {
+			throws NoteNotFoundException, UserNotFoundException, NoteTrashedException, LabelAdditionException {
 
 		String userId=(String) req.getAttribute("token");
 		
@@ -120,6 +123,45 @@ public class NoteController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 	
+	//-------------Delete A Label------------------------------
+	
+	@DeleteMapping(value = "/deleteLabel")
+	public ResponseEntity<Response> deleteLabel(HttpServletRequest req,
+			@RequestParam(value="Label Id")String labelId)
+			throws Exception {
+
+		String userId=(String) req.getAttribute("token");
+		
+		noteService.removeLabel(userId,labelId);
+
+		Response response = new Response();
+
+		response.setMessage("Label is successfully updated");
+		response.setStatus(17);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	//-------------Update A Label-----------------------------
+	
+	@PutMapping(value = "/editLabel")
+	public ResponseEntity<Response> editLabel(HttpServletRequest req,
+			@RequestParam(value="Label Id")String labelId,@RequestParam(value="editName")String labelName)
+			throws Exception {
+
+		String userId=(String) req.getAttribute("token");
+		
+		noteService.editLabel(userId,labelId,labelName);
+
+		Response response = new Response();
+
+		response.setMessage("Label is successfully updated");
+		response.setStatus(19);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
+	
 	// ------------Update An Existing Note-------------------
 
 	@PutMapping(value = "/update")
@@ -142,7 +184,7 @@ public class NoteController {
 	// --------------------View trashed Notes--------------------
 
 	@GetMapping("/viewtrashed")
-	public ResponseEntity<List<Note>> viewTrashedNotes()
+	public ResponseEntity<List<ViewDTO>> viewTrashedNotes()
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException, NullEntryException {
 
 		noteService.viewTrashed();
@@ -211,7 +253,7 @@ public class NoteController {
 	// --------------View Archieved Notes--------------------------------
 
 	@GetMapping(value = "/viewarchieved")
-	public ResponseEntity<List<Note>> viewArchievedNotes() throws NullEntryException {
+	public ResponseEntity<List<ViewDTO>> viewArchievedNotes() throws NullEntryException {
 
 		noteService.viewArchieved();
 
@@ -239,7 +281,7 @@ public class NoteController {
 	// ------------------View Pinned Notes----------------------------
 
 	@GetMapping(value = "/viewpinned")
-	public ResponseEntity<List<Note>> viewPinnedNotes() throws NullEntryException {
+	public ResponseEntity<List<ViewDTO>> viewPinnedNotes() throws NullEntryException {
 
 		noteService.viewPinned();
 
@@ -249,7 +291,7 @@ public class NoteController {
 	// ----------------Read Entire Details Of All The Notes------------
 
 	@GetMapping("/readallnotes")
-	public ResponseEntity<List<Note>> readAllNotes()
+	public ResponseEntity<List<ViewDTO>> readAllNotes()
 			throws NullEntryException, NoteNotFoundException, NoteCreationException, UserNotFoundException {
 
 		noteService.readAllNotes();
@@ -260,7 +302,7 @@ public class NoteController {
 	// ----------Read A Particular Note-------------------------------
 
 	@PostMapping("/getnote/{noteId}")
-	public ResponseEntity<Note> readParticularNote(HttpServletRequest req,
+	public ResponseEntity<ViewDTO> readParticularNote(HttpServletRequest req,
 			@PathVariable("noteId") String noteId)
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException {
 
@@ -276,7 +318,7 @@ public class NoteController {
 	@RequestMapping(value = "/addreminder/{noteId}", method = RequestMethod.POST)
 	public ResponseEntity<Response> addNoteReminder(HttpServletRequest req,
 			@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date date, @PathVariable String noteId)
-			throws NoteCreationException, UserNotFoundException, NoteNotFoundException, NoteTrashedException {
+			throws NoteCreationException, UserNotFoundException, NoteNotFoundException, NoteTrashedException, DateException {
 
 		String userId=(String) req.getAttribute("token");
 		

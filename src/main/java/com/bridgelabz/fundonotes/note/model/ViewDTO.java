@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 public class ViewDTO {
+	
+	String noteId;
 	String title;
 	String description;
 	// @ApiModelProperty(hidden = true)
@@ -102,10 +104,19 @@ public class ViewDTO {
 		this.pin = pin;
 	}
 
+	
+	public String getNoteId() {
+		return noteId;
+	}
+
+	public void setNoteId(String noteId) {
+		this.noteId = noteId;
+	}
+
 	@Override
 	public String toString() {
-		return "ViewDTO [title=" + title + ", description=" + description + ", createdAt=" + createdAt
-				+ ", lastModifiedAt=" + lastModifiedAt + ", label=" + label + ", testColor=" + testColor
+		return "ViewDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
+				+ createdAt + ", lastModifiedAt=" + lastModifiedAt + ", label=" + label + ", testColor=" + testColor
 				+ ", setReminder=" + setReminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
 				+ pin + "]";
 	}

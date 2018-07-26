@@ -113,6 +113,34 @@ public class GlobalExceptionHandlerForNote {
 		response.setStatus(501);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(DateException.class)
+	public ResponseEntity<Response> dateExceptionHandler(DateException e) {
+		logger.error("date error");
+		Response response = new Response();
+		response.setMessage("date exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(LabelAdditionException.class)
+	public ResponseEntity<Response> LabelAdditionExceptionHandler(LabelAdditionException e) {
+		logger.error("label addition error in list");
+		Response response = new Response();
+		response.setMessage("label addition exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(LabelNotFoundException.class)
+	public ResponseEntity<Response> labelNotFoundExceptionHandler(LabelNotFoundException e) {
+		logger.error("label not found error in list");
+		Response response = new Response();
+		response.setMessage("label not found exception, " + e.getMessage());
+		response.setStatus(501);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {
 		logger.error("other exceptions");
