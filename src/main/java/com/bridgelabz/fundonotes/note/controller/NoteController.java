@@ -148,7 +148,7 @@ public class NoteController {
 
 		Response response = new Response();
 
-		response.setMessage("Label is successfully updated");
+		response.setMessage("Label is successfully deleted");
 		response.setStatus(17);
 
 		return new ResponseEntity<>(response, HttpStatus.CREATED);

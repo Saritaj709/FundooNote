@@ -280,7 +280,7 @@ public class NoteServiceImpl implements NoteService {
 		if(!label.get().getUserId().equals(userId)) {
 			throw new UserNotFoundException("the user with given id is not found");
 		}
-		List<Note> noteList=noteRepository.findAllByUserId(userId);
+		ArrayList<Note> noteList=(ArrayList<Note>)noteRepository.findAllByUserId(userId);
 		for(int i=0;i<noteList.size();i++) {
 			Note note=noteList.get(i);
 			for(int j=0;j<note.getLabel().size();j++) {
@@ -579,21 +579,6 @@ public class NoteServiceImpl implements NoteService {
 			if (!noteList.get(index).isTrashed()) {
 
 				if (noteList.get(index).isPin()) {
-
-					/*
-					 * ViewDTO viewDto = new ViewDTO();
-					 * viewDto.setCreatedAt(noteList.get(index).getCreatedAt());
-					 * viewDto.setDescription(noteList.get(index).getDescription());
-					 * viewDto.setTitle(noteList.get(index).getTitle());
-					 * viewDto.setSetReminder(noteList.get(index).getSetReminder());
-					 * viewDto.setTestColor(noteList.get(index).getColor());
-					 * viewDto.setTrashed(noteList.get(index).isTrashed());
-					 * viewDto.setArchieve(noteList.get(index).isArchieve());
-					 * viewDto.setPin(noteList.get(index).isPin());
-					 * viewDto.setLabel(noteList.get(index).getLabel());
-					 * viewDto.setLastModifiedAt(noteList.get(index).getLastModifiedAt());
-					 * viewList.add(viewDto); return viewList;
-					 */
 
 					ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
 					pinnedList.add(viewDto);
