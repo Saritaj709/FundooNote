@@ -3,8 +3,6 @@ package com.bridgelabz.fundonotes.note.services;
 import java.util.Date;
 import java.util.List;
 
-import org.springframework.stereotype.Service;
-
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
@@ -69,4 +67,8 @@ public interface NoteService {
 	void editLabel(String userId, String labelId, String labelName) throws LabelNotFoundException, UserNotFoundException;
 
 	List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UserNotFoundException, NoteNotFoundException;
+
+	void removeLabelFromNote(String userId, String noteId, String labelId) throws LabelNotFoundException, NoteNotFoundException, UserNotFoundException;
+
+	List<ViewNoteDTO> readUserNotes(String userId) throws NullEntryException;
 }

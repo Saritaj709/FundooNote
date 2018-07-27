@@ -139,7 +139,7 @@ public class NoteController {
 	
 	@DeleteMapping(value = "/deleteLabel")
 	public ResponseEntity<Response> deleteLabel(HttpServletRequest req,
-			@RequestParam(value="Label Id")String labelId)
+			@RequestParam(value="LabelId")String labelId)
 			throws Exception {
 
 		String userId=(String) req.getAttribute("token");
@@ -154,11 +154,30 @@ public class NoteController {
 		return new ResponseEntity<>(response, HttpStatus.CREATED);
 	}
 	
+	//-------------Delete A Particular Label From A Particular Note-----
+	
+	@DeleteMapping(value="/deletelabelfromparticularnote")
+	public ResponseEntity<Response> deleteLabelFromParticularNote(HttpServletRequest req,@RequestParam(value="NoteId")String noteId,
+			@RequestParam(value="LabelId")String labelId)
+			throws Exception {
+
+		String userId=(String) req.getAttribute("token");
+		
+		noteService.removeLabelFromNote(userId,noteId,labelId);
+
+		Response response = new Response();
+
+		response.setMessage("Label from Note is successfully deleted");
+		response.setStatus(20);
+
+		return new ResponseEntity<>(response, HttpStatus.CREATED);
+	}
+	
 	//-------------Update A Label-----------------------------
 	
 	@PutMapping(value = "/editLabel")
 	public ResponseEntity<Response> editLabel(HttpServletRequest req,
-			@RequestParam(value="Label Id")String labelId,@RequestParam(value="editName")String labelName)
+			@RequestParam(value="LabelId")String labelId,@RequestParam(value="editName")String labelName)
 			throws Exception {
 
 		String userId=(String) req.getAttribute("token");
@@ -309,6 +328,17 @@ public class NoteController {
 		noteService.readAllNotes();
 
 		return new ResponseEntity<>(noteService.readAllNotes(), HttpStatus.OK);
+	}
+
+	//-----------------Read Notes Of A Particular User------------------
+	@GetMapping("/readusernotes")
+	public ResponseEntity<List<ViewNoteDTO>> readUserNotes(HttpServletRequest req)
+			throws NullEntryException, NoteNotFoundException, NoteCreationException, UserNotFoundException {
+         
+		String userId=(String) req.getAttribute("token");
+		noteService.readUserNotes(userId);
+
+		return new ResponseEntity<>(noteService.readUserNotes(userId), HttpStatus.OK);
 	}
 
 	// ----------Read A Particular Note-------------------------------

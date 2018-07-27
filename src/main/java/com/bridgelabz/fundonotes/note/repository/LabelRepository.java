@@ -26,4 +26,6 @@ public interface LabelRepository extends MongoRepository<Label,String>{
 
 	Optional<Label> findAllByLabelId(List<Label> label);
 
+	void deleteByLabelName(String labelName);
+
 }
