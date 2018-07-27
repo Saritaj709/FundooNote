@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
+import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
 import com.bridgelabz.fundonotes.note.exception.NoteArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
@@ -36,7 +37,7 @@ import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
-import com.bridgelabz.fundonotes.note.model.ViewDTO;
+import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.services.NoteService;
 
 @RestController
@@ -51,7 +52,7 @@ public class NoteController {
 	@PostMapping(value = "/create")
 	public ResponseEntity<Note> createNote(HttpServletRequest req,
 			@RequestBody CreateDTO createDto)
-			throws NoteCreationException, NoteNotFoundException, UserNotFoundException, DateException {
+			throws NoteCreationException, NoteNotFoundException, UserNotFoundException, DateException, LabelNotFoundException, NullEntryException {
 
 		String userId= (String) req.getAttribute("token");
 		
@@ -74,10 +75,10 @@ public class NoteController {
 		return new ResponseEntity<>(label, HttpStatus.CREATED);
 	}
 
-	// ------------------View Label---------------------------
+	// ------------------View All Labels---------------------------
 
-	@GetMapping(value = "/viewlabel")
-	public ResponseEntity<List<Label>> viewLabels()
+	@GetMapping(value = "/viewalllabels")
+	public ResponseEntity<List<Label>> viewAllLabels()
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException, NullEntryException {
 
 		noteService.viewLabels();
@@ -85,6 +86,17 @@ public class NoteController {
 		return new ResponseEntity<>(noteService.viewLabels(), HttpStatus.OK);
 	}
 
+	//-----------------View Label-------------------------------
+	@GetMapping(value = "/viewlabel")
+	public ResponseEntity<List<ViewNoteDTO>> viewLabel(HttpServletRequest req,@RequestParam(value="LabelId")String labelId)
+			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException, NullEntryException, LabelNotFoundException {
+
+		String userId=(String) req.getAttribute("token");
+		noteService.viewLabel(userId,labelId);
+
+		return new ResponseEntity<>(noteService.viewLabel(userId,labelId), HttpStatus.OK);
+	}
+	
 	// ---------------Add Label To Notes-----------------------
 	
 	@PostMapping(value = "/addlabel/{noteId}")
@@ -184,7 +196,7 @@ public class NoteController {
 	// --------------------View trashed Notes--------------------
 
 	@GetMapping("/viewtrashed")
-	public ResponseEntity<List<ViewDTO>> viewTrashedNotes()
+	public ResponseEntity<List<ViewNoteDTO>> viewTrashedNotes()
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException, NullEntryException {
 
 		noteService.viewTrashed();
@@ -253,7 +265,7 @@ public class NoteController {
 	// --------------View Archieved Notes--------------------------------
 
 	@GetMapping(value = "/viewarchieved")
-	public ResponseEntity<List<ViewDTO>> viewArchievedNotes() throws NullEntryException {
+	public ResponseEntity<List<ViewNoteDTO>> viewArchievedNotes() throws NullEntryException {
 
 		noteService.viewArchieved();
 
@@ -281,7 +293,7 @@ public class NoteController {
 	// ------------------View Pinned Notes----------------------------
 
 	@GetMapping(value = "/viewpinned")
-	public ResponseEntity<List<ViewDTO>> viewPinnedNotes() throws NullEntryException {
+	public ResponseEntity<List<ViewNoteDTO>> viewPinnedNotes() throws NullEntryException {
 
 		noteService.viewPinned();
 
@@ -291,7 +303,7 @@ public class NoteController {
 	// ----------------Read Entire Details Of All The Notes------------
 
 	@GetMapping("/readallnotes")
-	public ResponseEntity<List<ViewDTO>> readAllNotes()
+	public ResponseEntity<List<ViewNoteDTO>> readAllNotes()
 			throws NullEntryException, NoteNotFoundException, NoteCreationException, UserNotFoundException {
 
 		noteService.readAllNotes();
@@ -302,7 +314,7 @@ public class NoteController {
 	// ----------Read A Particular Note-------------------------------
 
 	@PostMapping("/getnote/{noteId}")
-	public ResponseEntity<ViewDTO> readParticularNote(HttpServletRequest req,
+	public ResponseEntity<ViewNoteDTO> readParticularNote(HttpServletRequest req,
 			@PathVariable("noteId") String noteId)
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException {
 

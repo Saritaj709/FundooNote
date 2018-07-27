@@ -3,7 +3,7 @@ package com.bridgelabz.fundonotes.note.repository;
 import org.springframework.stereotype.Repository;
 
 import com.bridgelabz.fundonotes.note.model.Note;
-import com.bridgelabz.fundonotes.note.model.ViewDTO;
+import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,7 +15,7 @@ public interface NoteRepository extends MongoRepository<Note,String>{
 
 	Optional<Note> findByNoteId(String noteId);
 
-	void save(ViewDTO viewNote);
+	void save(ViewNoteDTO viewNote);
 
 	void deleteByNoteId(String noteId);
 

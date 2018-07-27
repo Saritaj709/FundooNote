@@ -24,4 +24,6 @@ public interface LabelRepository extends MongoRepository<Label,String>{
 
 	List<Label> findAllByUserId(String userId);
 
+	Optional<Label> findAllByLabelId(List<Label> label);
+
 }

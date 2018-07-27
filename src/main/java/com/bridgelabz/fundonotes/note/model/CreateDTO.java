@@ -17,7 +17,9 @@ public class CreateDTO implements Serializable {
 	List<Label> label;
 	String color;
 	Date setReminder;
-
+	boolean archieve;
+	boolean pin;
+	
 	public String getTitle() {
 		return title;
 	}
@@ -46,8 +48,8 @@ public class CreateDTO implements Serializable {
 		return color;
 	}
 
-	public void setColor(String testColor) {
-		this.color = testColor;
+	public void setColor(String color) {
+		this.color = color;
 	}
 	
 
@@ -58,11 +60,27 @@ public class CreateDTO implements Serializable {
 	public void setSetReminder(Date setReminder) {
 		this.setReminder = setReminder;
 	}
+   
+	public boolean isArchieve() {
+		return archieve;
+	}
+
+	public void setArchieve(boolean archieve) {
+		this.archieve = archieve;
+	}
+
+	public boolean isPin() {
+		return pin;
+	}
+
+	public void setPin(boolean pin) {
+		this.pin = pin;
+	}
 
 	@Override
 	public String toString() {
-		return "CreateDTO [title=" + title + ", description=" + description + ", label=" + label
-				+ ", color=" + color + ", setReminder=" + setReminder + "]";
+		return "CreateDTO [title=" + title + ", description=" + description + ", label=" + label + ", color=" + color
+				+ ", setReminder=" + setReminder + ", archieve=" + archieve + ", pin=" + pin + "]";
 	}
 
 }

@@ -29,7 +29,7 @@ import com.bridgelabz.fundonotes.note.model.CreateLabelDTO;
 import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
-import com.bridgelabz.fundonotes.note.model.ViewDTO;
+import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.repository.LabelRepository;
 import com.bridgelabz.fundonotes.note.repository.NoteRepository;
 import com.bridgelabz.fundonotes.note.utility.NoteUtility;
@@ -54,7 +54,7 @@ public class NoteServiceImpl implements NoteService {
 
 	@Override
 	public Note createNote(String userId, CreateDTO createDto)
-			throws NoteNotFoundException, NoteCreationException, UserNotFoundException, DateException {
+			throws NoteNotFoundException, NoteCreationException, UserNotFoundException, DateException, LabelNotFoundException, NullEntryException {
 
 		NoteUtility.validateNoteCreation(createDto);
 
@@ -68,9 +68,23 @@ public class NoteServiceImpl implements NoteService {
 			throw new DateException("reminder cannot be before current date");
 
 		}
+		
 		noteDto.setUserId(userId);
 		noteDto.setCreatedAt(new Date());
 		noteDto.setLastModifiedAt(new Date());
+		
+		for(int i=0;i<createDto.getLabel().size();i++) {
+			List<Label> labelList=labelRepository.findByLabelName(createDto.getLabel().get(i).getLabelName());
+			if(labelList.isEmpty()) {
+				CreateLabelDTO labelDto=new CreateLabelDTO();
+				labelDto.setLabelName(createDto.getLabel().get(i).getLabelName());
+				labelDto.setUserId(userId);
+				createLabel(userId,labelDto);
+				List<Label> labelList1=labelRepository.findByLabelName(createDto.getLabel().get(i).getLabelName());
+				noteDto.setLabel(labelList1);
+				
+			    }
+		}
 
 		noteRepository.save(noteDto);
 
@@ -89,15 +103,16 @@ public class NoteServiceImpl implements NoteService {
 			throw new UserNotFoundException("The user with given id does not exist");
 		}
 
-		// Optional<Label>
-		// labelList=labelRepository.findByLabelName(createLabelDto.getLabelName());
 		List<Label> labelList = labelRepository.findByLabelName(createLabelDto.getLabelName());
 
 		if (!labelList.isEmpty()) {
 			throw new LabelCreationException("label with this name already exists");
 		}
 
-		Label labelDto = modelMapper.map(createLabelDto, Label.class);
+		//Label labelDto = modelMapper.map(createLabelDto, Label.class);
+		Label labelDto=new Label();
+		labelDto.setLabelName(createLabelDto.getLabelName());
+		labelDto.setUserId(createLabelDto.getUserId());
 
 		labelRepository.save(labelDto);
 
@@ -118,7 +133,6 @@ public class NoteServiceImpl implements NoteService {
 			throw new UserNotFoundException("Please enter valid token to match your account");
 		}
 
-		// Optional<Label> labelList = labelRepository.findByLabelName(labelName);
 		List<Label> labelList = labelRepository.findByLabelName(labelName);
 
 		if (labelList.isEmpty()) {
@@ -164,7 +178,42 @@ public class NoteServiceImpl implements NoteService {
 
 		return labelList;
 	}
+	
+	@Override
+	public List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UserNotFoundException, NoteNotFoundException {
+		// TODO Auto-generated method stub
+		Optional<Label> label=labelRepository.findByLabelId(labelId);
+		if(!label.isPresent()) {
+			throw new LabelNotFoundException("The label with the given id does not exist");
+		}
+		
+		if(!label.get().getUserId().equals(userId)) {
+			throw new UserNotFoundException("The user with the given id does not exist");
+		}
+		
+		ArrayList<Note> noteList=(ArrayList<Note>)noteRepository.findAllByUserId(userId);
+		
+		if(noteList==null) {
+			throw new NoteNotFoundException("no such note available");
+		}
+		
+		  ArrayList<ViewNoteDTO> viewList=new ArrayList<>();
+		for(int i=0;i<noteList.size();i++) {
+			Note note=noteList.get(i);
+				
+		 for(int j=0;j<note.getLabel().size();j++) {
+		  if(note.getLabel().get(j).getLabelId().equals(labelId)) {
+			
+			  ViewNoteDTO viewDto=modelMapper.map(noteList.get(i),ViewNoteDTO.class);
 
+			  viewList.add(viewDto);
+			 
+		  			}
+		 		}
+			}		
+		
+		 return viewList;
+	}
 	@Override
 	public void editOrRemoveLabel(String userId, Label labelDto, String choice) throws Exception {
 		// TODO Auto-generated method stub
@@ -202,8 +251,6 @@ public class NoteServiceImpl implements NoteService {
 			for (int i = 0; i < noteList.size(); i++) {
 
 				labelList = noteList.get(i).getLabel();
-
-			/*	if (noteList.size() > labelList.size()) {*/
 				
 					for (int j = 0; j < labelList.size(); j++) {
 						
@@ -216,27 +263,9 @@ public class NoteServiceImpl implements NoteService {
 						noteList.get(i).setLabel(labelList);
 						noteRepository.save(noteList.get(i));
 						System.out.println("removed from list : " + label.get());
-						
-				//	}
-					
-				//}
-			/*
-					if (noteList.size() < labelList.size()) {
-						System.out.println("exceed");
-						for (int j = 0; j <noteList.size(); j++) {
-							if (labelList.get(j).getLabelName().equalsIgnoreCase(label.get().getLabelName())) {
-
-								labelList.remove(label.get());
-						
-							noteList.get(i).setLabel(labelList);
-							noteRepository.save(noteList.get(i));
-							System.out.println("removed from list : " + label.get());
-							}
-						}
-					}*/
 				}
 
-			 //labelRepository.deleteByLabelId(labelDto.getLabelId());
+			 labelRepository.deleteByLabelId(labelDto.getLabelId());
 		}
 	}
 
@@ -251,7 +280,7 @@ public class NoteServiceImpl implements NoteService {
 		if(!label.get().getUserId().equals(userId)) {
 			throw new UserNotFoundException("the user with given id is not found");
 		}
-		ArrayList<Note> noteList=(ArrayList<Note>)noteRepository.findAllByUserId(userId);
+		List<Note> noteList=noteRepository.findAllByUserId(userId);
 		for(int i=0;i<noteList.size();i++) {
 			Note note=noteList.get(i);
 			for(int j=0;j<note.getLabel().size();j++) {
@@ -261,6 +290,7 @@ public class NoteServiceImpl implements NoteService {
 				}
 			}
 		}
+		
      labelRepository.deleteByLabelId(labelId);
 	}
 	
@@ -318,7 +348,7 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public List<ViewDTO> viewTrashed() throws NullEntryException {
+	public List<ViewNoteDTO> viewTrashed() throws NullEntryException {
 		// TODO Auto-generated method stub
 
 		List<Note> noteList = noteRepository.findAll();
@@ -327,13 +357,13 @@ public class NoteServiceImpl implements NoteService {
 			throw new NullEntryException("There is no any details stored in note yet");
 		}
 
-		List<ViewDTO> viewList = new LinkedList<>();
+		List<ViewNoteDTO> viewList = new LinkedList<>();
 
 		for (int index = 0; index < noteList.size(); index++) {
 
 			if (noteList.get(index).isTrashed()) {
 
-				ViewDTO viewDto = modelMapper.map(noteList.get(index), ViewDTO.class);
+				ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
 				viewList.add(viewDto);
 			}
 		}
@@ -341,7 +371,7 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public List<ViewDTO> readAllNotes() throws NullEntryException {
+	public List<ViewNoteDTO> readAllNotes() throws NullEntryException {
 
 		List<Note> noteList = noteRepository.findAll();
 
@@ -349,13 +379,13 @@ public class NoteServiceImpl implements NoteService {
 			throw new NullEntryException("There is no any details stored in note yet");
 		}
 
-		List<ViewDTO> viewList = new LinkedList<>();
+		List<ViewNoteDTO> viewList = new LinkedList<>();
 
 		for (int index = 0; index < noteList.size(); index++) {
 
 			if (!noteList.get(index).isTrashed()) {
 
-				ViewDTO viewDto = modelMapper.map(noteList.get(index), ViewDTO.class);
+				ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
 				viewList.add(viewDto);
 			}
 		}
@@ -363,7 +393,7 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public ViewDTO findNoteById(String userId, String noteId)
+	public ViewNoteDTO findNoteById(String userId, String noteId)
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException {
 
 		Optional<Note> checkNote = noteRepository.findById(noteId);
@@ -380,7 +410,7 @@ public class NoteServiceImpl implements NoteService {
 			throw new NoteTrashedException("the note with given details are already trashed");
 		}
 
-		ViewDTO viewDto = modelMapper.map(checkNote.get(), ViewDTO.class);
+		ViewNoteDTO viewDto = modelMapper.map(checkNote.get(), ViewNoteDTO.class);
 
 		return viewDto;
 	}
@@ -483,7 +513,7 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public List<ViewDTO> viewArchieved() throws NullEntryException {
+	public List<ViewNoteDTO> viewArchieved() throws NullEntryException {
 		// TODO Auto-generated method stub
 		List<Note> noteList = noteRepository.findAll();
 
@@ -491,7 +521,7 @@ public class NoteServiceImpl implements NoteService {
 			throw new NullEntryException("There is no any details stored in note yet");
 		}
 
-		List<ViewDTO> archieveList = new LinkedList<>();
+		List<ViewNoteDTO> archieveList = new LinkedList<>();
 
 		for (int index = 0; index < noteList.size(); index++) {
 
@@ -499,7 +529,7 @@ public class NoteServiceImpl implements NoteService {
 
 				if (noteList.get(index).isArchieve()) {
 
-					ViewDTO viewDto = modelMapper.map(noteList.get(index), ViewDTO.class);
+					ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
 					archieveList.add(viewDto);
 				}
 			}
@@ -534,7 +564,7 @@ public class NoteServiceImpl implements NoteService {
 	}
 
 	@Override
-	public List<ViewDTO> viewPinned() throws NullEntryException {
+	public List<ViewNoteDTO> viewPinned() throws NullEntryException {
 		// TODO Auto-generated method stub
 		List<Note> noteList = noteRepository.findAll();
 
@@ -542,7 +572,7 @@ public class NoteServiceImpl implements NoteService {
 			throw new NullEntryException("There is no any details stored in note yet");
 		}
 
-		List<ViewDTO> pinnedList = new LinkedList<>();
+		List<ViewNoteDTO> pinnedList = new LinkedList<>();
 
 		for (int index = 0; index < noteList.size(); index++) {
 
@@ -565,7 +595,7 @@ public class NoteServiceImpl implements NoteService {
 					 * viewList.add(viewDto); return viewList;
 					 */
 
-					ViewDTO viewDto = modelMapper.map(noteList.get(index), ViewDTO.class);
+					ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
 					pinnedList.add(viewDto);
 				}
 			}

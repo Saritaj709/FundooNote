@@ -8,8 +8,6 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Service;
 
-import com.bridgelabz.fundonotes.note.repository.LabelRepository;
-
 @Document(collection = "notes")
 @Service
 public class Note implements Serializable {
@@ -22,11 +20,8 @@ public class Note implements Serializable {
  	String noteId;
 	String title;
 	String description;
-	//@ApiModelProperty(hidden = true)
 	Date createdAt;
-	//@ApiModelProperty(hidden = true)
 	String userId;
-	//@ApiModelProperty(hidden = true)
 	Date lastModifiedAt;
 	String color="white";
 	Date setReminder=null;
@@ -91,8 +86,8 @@ public class Note implements Serializable {
 		return color;
 	}
 
-	public void setColor(String testColor) {
-		this.color = testColor;
+	public void setColor(String Color) {
+		this.color = Color;
 	}
 
 	public Date getSetReminder() {

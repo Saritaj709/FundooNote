@@ -70,26 +70,22 @@
 			<artifactId>spring-security-crypto</artifactId>
 		</dependency>
 
-		<!-- <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.9.2</version>
-            <scope>compile</scope>
-        </dependency> -->
-        
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger2</artifactId>
-            <version>2.5.0</version>
-            <scope>compile</scope>
-        </dependency>
-        
-        <dependency>
-            <groupId>io.springfox</groupId>
-            <artifactId>springfox-swagger-ui</artifactId>
-            <version>2.5.0</version>
-            <scope>compile</scope>
-        </dependency>
+		<!-- <dependency> <groupId>io.springfox</groupId> <artifactId>springfox-swagger2</artifactId> 
+			<version>2.9.2</version> <scope>compile</scope> </dependency> -->
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger2</artifactId>
+			<version>2.5.0</version>
+			<scope>compile</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>io.springfox</groupId>
+			<artifactId>springfox-swagger-ui</artifactId>
+			<version>2.5.0</version>
+			<scope>compile</scope>
+		</dependency>
 
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.amqp/spring-rabbit -->
@@ -117,7 +113,6 @@
 			<artifactId>modelmapper</artifactId>
 			<version>2.1.0</version>
 		</dependency>
-
 
 	</dependencies>
 

@@ -3,6 +3,8 @@ package com.bridgelabz.fundonotes.note.services;
 import java.util.Date;
 import java.util.List;
 
+import org.springframework.stereotype.Service;
+
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
@@ -19,18 +21,18 @@ import com.bridgelabz.fundonotes.note.model.CreateLabelDTO;
 import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
-import com.bridgelabz.fundonotes.note.model.ViewDTO;
+import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
 public interface NoteService {
-	Note createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException, DateException;
+	Note createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException, DateException, LabelNotFoundException, NullEntryException;
 
 	void updateNote(String token,UpdateDTO update) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException;
 
 	//boolean trashNote(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
 
-	List<ViewDTO> readAllNotes() throws NullEntryException;
+	List<ViewNoteDTO> readAllNotes() throws NullEntryException;
 	
-	ViewDTO findNoteById(String token,String noteId) throws UserNotFoundException, NoteNotFoundException, NoteTrashedException;
+	ViewNoteDTO findNoteById(String token,String noteId) throws UserNotFoundException, NoteNotFoundException, NoteTrashedException;
 
 	void deleteNoteForever(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
 
@@ -46,11 +48,11 @@ public interface NoteService {
 
 	void pinNote(String token, String noteId) throws NoteNotFoundException, UserNotFoundException, NotePinnedException, NoteTrashedException;
 
-	List<ViewDTO> viewArchieved() throws NullEntryException;
+	List<ViewNoteDTO> viewArchieved() throws NullEntryException;
 
-	List<ViewDTO> viewPinned() throws NullEntryException;
+	List<ViewNoteDTO> viewPinned() throws NullEntryException;
 
-	List<ViewDTO> viewTrashed() throws NullEntryException;
+	List<ViewNoteDTO> viewTrashed() throws NullEntryException;
 
 	Label createLabel(String token, CreateLabelDTO createLabelDto) throws UserNotFoundException, NullEntryException, NoteNotFoundException;
 
@@ -65,4 +67,6 @@ public interface NoteService {
 	void removeLabel(String userId, String labelName) throws NoteNotFoundException, LabelNotFoundException, UserNotFoundException;
 
 	void editLabel(String userId, String labelId, String labelName) throws LabelNotFoundException, UserNotFoundException;
+
+	List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UserNotFoundException, NoteNotFoundException;
 }

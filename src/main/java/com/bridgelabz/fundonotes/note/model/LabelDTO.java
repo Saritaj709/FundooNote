@@ -2,7 +2,7 @@ package com.bridgelabz.fundonotes.note.model;
 
 import java.io.Serializable;
 
-public class ViewLabelDTO implements Serializable {
+public class LabelDTO implements Serializable {
 
 	/**
 	 * 
