@@ -65,7 +65,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("note trashed error");
 		Response response = new Response();
 		response.setMessage("note trashed exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(601);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -74,7 +74,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("no reminder to set error");
 		Response response = new Response();
 		response.setMessage("no reminder to set exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(701);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -83,7 +83,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("no reminder to set error");
 		Response response = new Response();
 		response.setMessage("no reminder to set exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(801);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -91,8 +91,8 @@ public class GlobalExceptionHandlerForNote {
 	public ResponseEntity<Response> notePinnedExceptionHandler(NotePinnedException e) {
 		logger.error("no reminder to set error");
 		Response response = new Response();
-		response.setMessage("no reminder to set exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setMessage("note pinned exception, " + e.getMessage());
+		response.setStatus(901);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -101,7 +101,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("no label to set error");
 		Response response = new Response();
 		response.setMessage("no label available to set exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(111);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -110,7 +110,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("no label to set error");
 		Response response = new Response();
 		response.setMessage("no label available to set exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(112);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -119,7 +119,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("date error");
 		Response response = new Response();
 		response.setMessage("date exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(113);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -128,7 +128,7 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("label addition error in list");
 		Response response = new Response();
 		response.setMessage("label addition exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(114);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
@@ -137,9 +137,28 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("label not found error in list");
 		Response response = new Response();
 		response.setMessage("label not found exception, " + e.getMessage());
-		response.setStatus(501);
+		response.setStatus(116);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
+	
+	@ExceptionHandler(NoteUnPinnedException.class)
+	public ResponseEntity<Response> noteUnPinnedExceptionHandler(NoteUnPinnedException e) {
+		logger.error("note unpinned error");
+		Response response = new Response();
+		response.setMessage("note unpinned exception, " + e.getMessage());
+		response.setStatus(119);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(NoteUnArchievedException.class)
+	public ResponseEntity<Response> noteUnArchievedExceptionHandler(NoteUnArchievedException e) {
+		logger.error("note unarchieved error");
+		Response response = new Response();
+		response.setMessage("note unarchieved exception, " + e.getMessage());
+		response.setStatus(119);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
 	
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {

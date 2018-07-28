@@ -21,6 +21,8 @@ import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
 import com.bridgelabz.fundonotes.note.exception.NotePinnedException;
 import com.bridgelabz.fundonotes.note.exception.NoteTrashedException;
+import com.bridgelabz.fundonotes.note.exception.NoteUnArchievedException;
+import com.bridgelabz.fundonotes.note.exception.NoteUnPinnedException;
 import com.bridgelabz.fundonotes.note.exception.NullEntryException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
 import com.bridgelabz.fundonotes.note.exception.UserNotFoundException;
@@ -52,12 +54,19 @@ public class NoteServiceImpl implements NoteService {
 	@Value("${Color}")
 	String Color;
 
-	@Override
 	/**
-	 * @param userId
-	 * @author Sarita
-	 * @Return Note
+	 * 
+	 * @param token
+	 * @param create
+	 * @return Note
+	 * @throws NoteNotFoundException
+	 * @throws NoteCreationException
+	 * @throws UserNotFoundException
+	 * @throws DateException
+	 * @throws LabelNotFoundException
+	 * @throws NullEntryException
 	 */
+	@Override
 	public Note createNote(String userId, CreateDTO createDto) throws NoteNotFoundException, NoteCreationException,
 			UserNotFoundException, DateException, LabelNotFoundException, NullEntryException {
 
@@ -101,6 +110,15 @@ public class NoteServiceImpl implements NoteService {
 
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param createLabelDto
+	 * @return Label
+	 * @throws UserNotFoundException
+	 * @throws NullEntryException
+	 * @throws NoteNotFoundException
+	 */
 	@Override
 	public Label createLabel(String userId, CreateLabelDTO createLabelDto)
 			throws UserNotFoundException, NullEntryException, NoteNotFoundException {
@@ -128,6 +146,16 @@ public class NoteServiceImpl implements NoteService {
 		return labelDto;
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param labelId
+	 * @param noteId
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws NoteTrashedException
+	 * @throws LabelAdditionException
+	 */
 	@Override
 	public void addLabel(String userId, String labelName, String noteId)
 			throws NoteNotFoundException, UserNotFoundException, NoteTrashedException, LabelAdditionException {
@@ -176,6 +204,11 @@ public class NoteServiceImpl implements NoteService {
 
 	}
 
+	/**
+	 * 
+	 * @return List of Labels
+	 * @throws NullEntryException
+	 */
 	@Override
 	public List<Label> viewLabels() throws NullEntryException {
 		// TODO Auto-generated method stub
@@ -188,6 +221,15 @@ public class NoteServiceImpl implements NoteService {
 		return labelList;
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @param labelId
+	 * @return List of ViewNoteDTO
+	 * @throws LabelNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws NoteNotFoundException
+	 */
 	@Override
 	public List<ViewNoteDTO> viewLabel(String userId, String labelId)
 			throws LabelNotFoundException, UserNotFoundException, NoteNotFoundException {
@@ -225,61 +267,14 @@ public class NoteServiceImpl implements NoteService {
 		return viewList;
 	}
 
-	@Override
-	public void editOrRemoveLabel(String userId, Label labelDto, String choice) throws Exception {
-		// TODO Auto-generated method stub
-
-		if (!userId.equals(labelDto.getUserId())) {
-			throw new UserNotFoundException("Please enter valid token to match your account");
-		}
-
-		Optional<Label> label = labelRepository.findByLabelId(labelDto.getLabelId());
-
-		if (!label.isPresent()) {
-			throw new NoSuchLabelException("The label with the given id does not exist");
-		}
-
-		List<Note> checkNote = noteRepository.findAllByUserId(labelDto.getUserId());
-		if (checkNote.isEmpty()) {
-			throw new NoteNotFoundException("Note Not Found Exception");
-		}
-
-		List<Note> noteList = new LinkedList<>();
-
-		noteList = checkNote;
-		List<Label> labelList = new LinkedList<>();
-
-		if (choice.equalsIgnoreCase("edit")) {
-
-			labelDto.setLabelName(labelDto.getLabelName());
-			labelDto.setLabelId(label.get().getLabelId());
-			labelDto.setUserId(label.get().getUserId());
-			labelRepository.save(labelDto);
-		}
-
-		if (choice.equalsIgnoreCase("delete")) {
-
-			for (int i = 0; i < noteList.size(); i++) {
-
-				labelList = noteList.get(i).getLabel();
-
-				for (int j = 0; j < labelList.size(); j++) {
-
-					if (labelList.get(j).getLabelName().equalsIgnoreCase(labelDto.getLabelName())) {
-
-						labelList.remove(label.get());
-
-					}
-				}
-				noteList.get(i).setLabel(labelList);
-				noteRepository.save(noteList.get(i));
-				System.out.println("removed from list : " + label.get());
-			}
-
-			labelRepository.deleteByLabelId(labelDto.getLabelId());
-		}
-	}
-
+	/**
+	 * 
+	 * @param userId
+	 * @param labelName
+	 * @throws NoteNotFoundException
+	 * @throws LabelNotFoundException
+	 * @throws UserNotFoundException
+	 */
 	@Override
 	public void removeLabel(String userId, String labelId)
 			throws NoteNotFoundException, LabelNotFoundException, UserNotFoundException {
@@ -306,6 +301,15 @@ public class NoteServiceImpl implements NoteService {
 		labelRepository.deleteByLabelId(labelId);
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @param noteId
+	 * @param labelId
+	 * @throws LabelNotFoundException
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 */
 	@Override
 	public void removeLabelFromNote(String userId, String noteId, String labelId)
 			throws LabelNotFoundException, NoteNotFoundException, UserNotFoundException {
@@ -333,6 +337,14 @@ public class NoteServiceImpl implements NoteService {
 		}
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @param labelId
+	 * @param labelName
+	 * @throws LabelNotFoundException
+	 * @throws UserNotFoundException
+	 */
 	@Override
 	public void editLabel(String userId, String labelId, String labelName)
 			throws LabelNotFoundException, UserNotFoundException {
@@ -359,6 +371,14 @@ public class NoteServiceImpl implements NoteService {
 		labelRepository.save(label.get());
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param update
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws NoteTrashedException
+	 */
 	@Override
 	public void updateNote(String userId, UpdateDTO updateDto)
 			throws NoteNotFoundException, UserNotFoundException, NoteTrashedException {
@@ -387,6 +407,11 @@ public class NoteServiceImpl implements NoteService {
 		noteRepository.save(note);
 	}
 
+	/**
+	 * 
+	 * @return List of Trashed Notes
+	 * @throws NullEntryException
+	 */
 	@Override
 	public List<ViewNoteDTO> viewTrashed() throws NullEntryException {
 		// TODO Auto-generated method stub
@@ -410,6 +435,11 @@ public class NoteServiceImpl implements NoteService {
 		return viewList;
 	}
 
+	/**
+	 * 
+	 * @return List of Notes of A Particular user
+	 * @throws NullEntryException
+	 */
 	@Override
 	public List<ViewNoteDTO> readAllNotes() throws NullEntryException {
 
@@ -432,6 +462,12 @@ public class NoteServiceImpl implements NoteService {
 		return viewList;
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @return List of ViewNoteDTO
+	 * @throws NullEntryException
+	 */
 	@Override
 	public List<ViewNoteDTO> readUserNotes(String userId) throws NullEntryException {
 		// TODO Auto-generated method stub
@@ -457,6 +493,15 @@ public class NoteServiceImpl implements NoteService {
 		return pinnedList;
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param noteId
+	 * @return List of ViewNoteDTO
+	 * @throws UserNotFoundException
+	 * @throws NoteNotFoundException
+	 * @throws NoteTrashedException
+	 */
 	@Override
 	public ViewNoteDTO findNoteById(String userId, String noteId)
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException {
@@ -501,6 +546,49 @@ public class NoteServiceImpl implements NoteService {
 		noteRepository.deleteByNoteId(noteId);
 	}
 
+	/**
+	 * 
+	 * @param userId
+	 * @param color
+	 * @param noteId
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws NoteTrashedException
+	 */
+	@Override
+	public void addColor(String userId, String color, String noteId)
+			throws NoteNotFoundException, UserNotFoundException, NoteTrashedException {
+		// TODO Auto-generated method stub
+		Optional<Note> checkNote = noteRepository.findById(noteId);
+
+		if (!checkNote.isPresent()) {
+			throw new NoteNotFoundException("the note with given id does not exist");
+		}
+
+		if (!userId.equals(checkNote.get().getUserId())) {
+			throw new UserNotFoundException("Please enter valid token to match your account");
+		}
+
+		if (checkNote.get().isTrashed()) {
+			throw new NoteTrashedException("this note no longer exists");
+		}
+
+		checkNote.get().setColor(color);
+		noteRepository.save(checkNote.get());
+
+	}
+
+	/**
+	 * 
+	 * @param token
+	 * @param date
+	 * @param noteId
+	 * @return boolean
+	 * @throws UserNotFoundException
+	 * @throws NoteNotFoundException
+	 * @throws NoteTrashedException
+	 * @throws DateException
+	 */
 	@Override
 	public boolean addReminder(String userId, Date date, String noteId)
 			throws UserNotFoundException, NoteNotFoundException, NoteTrashedException, DateException {
@@ -529,6 +617,15 @@ public class NoteServiceImpl implements NoteService {
 
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param noteId
+	 * @throws NullEntryException
+	 * @throws UserNotFoundException
+	 * @throws NoteNotFoundException
+	 * @throws NoteTrashedException
+	 */
 	@Override
 	public void deleteReminder(String userId, String noteId)
 			throws NullEntryException, UserNotFoundException, NoteNotFoundException, NoteTrashedException {
@@ -551,9 +648,19 @@ public class NoteServiceImpl implements NoteService {
 		noteRepository.save(checkNote.get());
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param noteId
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws NoteArchievedException
+	 * @throws NoteTrashedException
+	 * @throws NoteUnArchievedException
+	 */
 	@Override
-	public void archieveNote(String userId, String noteId)
-			throws NoteNotFoundException, UserNotFoundException, NoteArchievedException, NoteTrashedException {
+	public void archieveOrUnArchieveNote(String userId, String noteId, boolean choice) throws NoteNotFoundException,
+			UserNotFoundException, NoteArchievedException, NoteTrashedException, NoteUnArchievedException {
 
 		Optional<Note> checkNote = noteRepository.findById(noteId);
 		if (!checkNote.isPresent()) {
@@ -568,14 +675,30 @@ public class NoteServiceImpl implements NoteService {
 			throw new NoteTrashedException("the note with given details is trashed,pls restore first to archieve");
 		}
 
-		if (checkNote.get().isArchieve()) {
-			throw new NoteArchievedException("the note with given details is already archieved");
+		if (choice) {
+
+			if (checkNote.get().isArchieve()) {
+				throw new NoteArchievedException("the note with given details is already archieved");
+			}
+
+			checkNote.get().setArchieve(true);
 		}
 
-		checkNote.get().setArchieve(true);
+		else {
+			if (!checkNote.get().isArchieve()) {
+				throw new NoteUnArchievedException("the note with given details is already unarchieved");
+			}
+			checkNote.get().setArchieve(false);
+		}
+
 		noteRepository.save(checkNote.get());
 	}
 
+	/**
+	 * 
+	 * @return List of Archived Notes
+	 * @throws NullEntryException
+	 */
 	@Override
 	public List<ViewNoteDTO> viewArchieved() throws NullEntryException {
 		// TODO Auto-generated method stub
@@ -601,9 +724,19 @@ public class NoteServiceImpl implements NoteService {
 		return archieveList;
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param noteId
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws NotePinnedException
+	 * @throws NoteTrashedException
+	 * @throws NoteUnPinnedException
+	 */
 	@Override
-	public void pinNote(String userId, String noteId)
-			throws NoteNotFoundException, UserNotFoundException, NotePinnedException, NoteTrashedException {
+	public void pinOrUnpinNote(String userId, String noteId, boolean choice) throws NoteNotFoundException,
+			UserNotFoundException, NotePinnedException, NoteTrashedException, NoteUnPinnedException {
 
 		Optional<Note> checkNote = noteRepository.findById(noteId);
 
@@ -619,14 +752,32 @@ public class NoteServiceImpl implements NoteService {
 			throw new NoteTrashedException("the note with given details is already trashed,pls restore first to pin");
 		}
 
-		if (checkNote.get().isArchieve()) {
-			throw new NotePinnedException("the note with given details is already pinned");
+		if (choice) {
+
+			if (checkNote.get().isPin()) {
+				throw new NotePinnedException("the note with given details is already pinned");
+			}
+
+			checkNote.get().setPin(true);
 		}
 
-		checkNote.get().setPin(true);
+		else {
+
+			if (!checkNote.get().isPin()) {
+				throw new NoteUnPinnedException("the note with given details is already pinned");
+			}
+
+			checkNote.get().setPin(false);
+		}
+
 		noteRepository.save(checkNote.get());
 	}
 
+	/**
+	 * 
+	 * @return List of Pinned Notes
+	 * @throws NullEntryException
+	 */
 	@Override
 	public List<ViewNoteDTO> viewPinned() throws NullEntryException {
 		// TODO Auto-generated method stub
@@ -652,8 +803,18 @@ public class NoteServiceImpl implements NoteService {
 		return pinnedList;
 	}
 
+	/**
+	 * 
+	 * @param token
+	 * @param noteId
+	 * @param choice
+	 * @throws NoteNotFoundException
+	 * @throws UserNotFoundException
+	 * @throws UntrashedException
+	 * @throws NoteTrashedException
+	 */
 	@Override
-	public void deleteOrRestoreNote(String userId, String noteId, String choice)
+	public void deleteOrRestoreNote(String userId, String noteId, boolean choice)
 			throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException {
 		// TODO Auto-generated method stub
 
@@ -667,26 +828,25 @@ public class NoteServiceImpl implements NoteService {
 			throw new UserNotFoundException("Please enter valid token to match your account");
 		}
 
-		if (choice.equalsIgnoreCase("restore")) {
-
-			if (!checkNote.get().isTrashed()) {
-				throw new UntrashedException("Note is already restored,it is not trashed yet");
-			}
-
-			checkNote.get().setTrashed(false);
-			noteRepository.save(checkNote.get());
-		}
-
-		if (choice.equalsIgnoreCase("delete")) {
+		if (choice) {
 
 			if (checkNote.get().isTrashed()) {
 				throw new NoteTrashedException("the note with given details is already trashed");
 			}
 
 			checkNote.get().setTrashed(true);
-			noteRepository.save(checkNote.get());
 
 		}
-	}
 
+		else {
+
+			if (!checkNote.get().isTrashed()) {
+				throw new UntrashedException("Note is already restored,it is not trashed yet");
+			}
+
+			checkNote.get().setTrashed(false);
+
+		}
+		noteRepository.save(checkNote.get());
+	}
 }

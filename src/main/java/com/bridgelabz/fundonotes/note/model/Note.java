@@ -23,7 +23,7 @@ public class Note implements Serializable {
 	Date createdAt;
 	String userId;
 	Date lastModifiedAt;
-	String color="white";
+	String color="#fff";
 	Date setReminder=null;
 	boolean isTrashed;
 	boolean archieve;

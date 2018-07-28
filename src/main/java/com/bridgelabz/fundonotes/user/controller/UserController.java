@@ -167,7 +167,7 @@ public class UserController {
 		userService.passwordReset(token, passwordDto);
 
 		ResponseDTO response = new ResponseDTO();
-		response.setMessage("Congratulations,your password is successfully changed");
+		response.setMessage("Password is successfully changed");
 		response.setStatus(4);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);

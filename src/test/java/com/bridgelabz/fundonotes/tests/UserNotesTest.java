@@ -77,7 +77,7 @@ public class UserNotesTest{
 				"token",
 				"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzI0MTE1MjIsInN1YiI6IjViNTU5YWVlMWNhY2U5MGY1MTQwOGFjOCJ9.EXPuTNFKa6SICBjS7lOAoQjjxrFZ14_YavT2-bu6CQA")
 				.content("{ \"password\" :\"Shru@1234\",\"confirmPassword\":\"Shru@1234\"}"))
-				.andExpect(jsonPath("$.message").value("Congratulations,your password is successfully changed"))
+				.andExpect(jsonPath("$.message").value("Password is successfully changed"))
 				.andExpect(jsonPath("$.status").value(4));
 	}
 	
@@ -91,16 +91,16 @@ public class UserNotesTest{
 		mockMvc.perform(MockMvcRequestBuilders.post("/api/notes/create").contentType(MediaType.APPLICATION_JSON).header("token","eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzI0MTMzOTMsInN1YiI6IjViNTVhYzkxMWNhY2U5MmQ3YTUzZGQ2MSJ9.iKwYXsbaFz791y-9QtlrZI_3ew_vhoHxqarZYKbWPVk").content(
 				"{\"title\":\"note for test\",\"description\":\"note green\",\"userId\":\"5b55ac911cace92d7a53dd61\",\"label\":\"good\",\"color\":\"blue\"}")
 				.accept(MediaType.APPLICATION_JSON))
-				.andExpect(jsonPath("$.message").value("Congratulations,your note is successfully created"))
+				.andExpect(jsonPath("$.message").value("your note is successfully created"))
 				.andExpect(jsonPath("$.status").value(1));
 	}
 	
-	//@Test
+//	@Test
 		public void noteUpdateTest() throws Exception {
 			mockMvc.perform(MockMvcRequestBuilders.put("/api/notes/update").contentType(MediaType.APPLICATION_JSON).header("token","eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzI0MTMzOTMsInN1YiI6IjViNTVhYzkxMWNhY2U5MmQ3YTUzZGQ2MSJ9.iKwYXsbaFz791y-9QtlrZI_3ew_vhoHxqarZYKbWPVk").content(
 					"{\"title\":\"note for mockito test\",\"description\":\"note green\",\"noteId\":\"5b55c8e61cace95939105613\",\"label\":\"good\"}")
 					.accept(MediaType.TEXT_PLAIN_VALUE))
-					.andExpect(jsonPath("$.message").value("Congratulations,your details are successfully updated"))
+					.andExpect(jsonPath("$.message").value("Note successfully updated"))
 					.andExpect(jsonPath("$.status").value(2));
 		}
 		
