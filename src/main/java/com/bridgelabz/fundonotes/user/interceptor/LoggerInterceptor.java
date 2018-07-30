@@ -1,4 +1,4 @@
-package com.bridgelabz.fundonotes.user.filter;
+package com.bridgelabz.fundonotes.user.interceptor;
 
 import java.util.UUID;
 

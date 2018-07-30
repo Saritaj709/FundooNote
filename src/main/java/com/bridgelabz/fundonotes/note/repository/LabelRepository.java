@@ -20,12 +20,16 @@ public interface LabelRepository extends MongoRepository<Label,String>{
 
 	void deleteByLabelId(String labelId);
 
-	Optional<Label> findByUserId(String userId);
+	List<Label> findByUserId(String userId);
 
 	List<Label> findAllByUserId(String userId);
 
 	Optional<Label> findAllByLabelId(List<Label> label);
 
 	void deleteByLabelName(String labelName);
+
+	List<Label> findByLabelNameAndUserId(String labelName, String userId);
+
+	List<Label> findByLabelIdAndUserId(String labelId, String userId);
 
 }

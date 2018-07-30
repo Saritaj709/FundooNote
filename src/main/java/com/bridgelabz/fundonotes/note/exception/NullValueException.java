@@ -1,12 +1,12 @@
 package com.bridgelabz.fundonotes.note.exception;
 
-public class NullEntryException extends Exception{
+public class NullValueException extends Exception{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
-	public NullEntryException(final String message) {
+	public NullValueException(final String message) {
 		super(message);
 	}
 }

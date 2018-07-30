@@ -1,6 +1,5 @@
 package com.bridgelabz.fundonotes.note.model;
 
-import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
 
@@ -10,12 +9,8 @@ import org.springframework.stereotype.Service;
 
 @Document(collection = "notes")
 @Service
-public class Note implements Serializable {
+public class Note {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	@Id
  	String noteId;
 	String title;
@@ -24,11 +19,11 @@ public class Note implements Serializable {
 	String userId;
 	Date lastModifiedAt;
 	String color="#fff";
-	Date setReminder=null;
+	Date reminder=null;
 	boolean isTrashed;
 	boolean archieve;
 	boolean pin;
-	List<Label> Label;
+	List<Label> Labels;
 
 	public Note() {
 		super();
@@ -90,12 +85,12 @@ public class Note implements Serializable {
 		this.color = Color;
 	}
 
-	public Date getSetReminder() {
-		return setReminder;
+	public Date getReminder() {
+		return reminder;
 	}
 
-	public void setSetReminder(Date setReminder) {
-		this.setReminder = setReminder;
+	public void setReminder(Date reminder) {
+		this.reminder = reminder;
 	}
 
 	public boolean isTrashed() {
@@ -122,20 +117,20 @@ public class Note implements Serializable {
 		this.pin = pinned;
 	}
 
-	public List<Label> getLabel() {
-		return Label;
+	public List<Label> getLabels() {
+		return Labels;
 	}
 
-	public void setLabel(List<Label> label) {
-		Label = label;
+	public void setLabels(List<Label> labels) {
+		Labels = labels;
 	}
 
 	@Override
 	public String toString() {
 		return "NoteDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
 				+ createdAt + ", userId=" + userId + ", lastModifiedAt=" + lastModifiedAt + ", color=" + color
-				+ ", setReminder=" + setReminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
-				+ pin + ", Label=" + Label + "]";
+				+ ", reminder=" + reminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
+				+ pin + ", Labels=" + Labels + "]";
 	}
 
 }

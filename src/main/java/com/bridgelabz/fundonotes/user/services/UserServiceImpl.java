@@ -113,10 +113,10 @@ public class UserServiceImpl implements UserService {
 			throw new UserNotFoundException("This Email id does not exist");
 		}
 
-		if (!checkUser.get().isActivate()) {
+	/*	if (!checkUser.get().isActivate()) {
 			throw new ActivationException("User account is not activated yet");
 		}
-
+*/
 		if (!passwordEncoder.matches(loginDto.getPassword(), checkUser.get().getPassword())) {
 			throw new LoginException("Password unmatched");
 		}

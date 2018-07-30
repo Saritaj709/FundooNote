@@ -1,22 +1,16 @@
 package com.bridgelabz.fundonotes.note.model;
 
-import java.io.Serializable;
 import java.sql.Date;
 import java.util.List;
 
-public class CreateDTO implements Serializable {
-
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+public class CreateDTO {
 
 	String title;
 	String description;
 
-	List<Label> label;
+	List<Label> labels;
 	String color;
-	Date setReminder;
+	Date reminder;
 	boolean archieve;
 	boolean pin;
 	
@@ -36,12 +30,12 @@ public class CreateDTO implements Serializable {
 		this.description = description;
 	}
 
-	public List<Label> getLabel() {
-		return label;
+	public List<Label> getLabels() {
+		return labels;
 	}
 
-	public void setLabel(List<Label> label) {
-		this.label = label;
+	public void setLabels(List<Label> labels) {
+		this.labels = labels;
 	}
 
 	public String getColor() {
@@ -53,12 +47,12 @@ public class CreateDTO implements Serializable {
 	}
 	
 
-	public Date getSetReminder() {
-		return setReminder;
+	public Date getReminder() {
+		return reminder;
 	}
 
-	public void setSetReminder(Date setReminder) {
-		this.setReminder = setReminder;
+	public void setReminder(Date reminder) {
+		this.reminder = reminder;
 	}
    
 	public boolean isArchieve() {
@@ -79,8 +73,8 @@ public class CreateDTO implements Serializable {
 
 	@Override
 	public String toString() {
-		return "CreateDTO [title=" + title + ", description=" + description + ", label=" + label + ", color=" + color
-				+ ", setReminder=" + setReminder + ", archieve=" + archieve + ", pin=" + pin + "]";
+		return "CreateDTO [title=" + title + ", description=" + description + ", labels=" + labels + ", color=" + color
+				+ ", reminder=" + reminder + ", archieve=" + archieve + ", pin=" + pin + "]";
 	}
 
 }

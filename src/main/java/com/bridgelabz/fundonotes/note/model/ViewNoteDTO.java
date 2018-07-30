@@ -10,9 +10,9 @@ public class ViewNoteDTO {
 	String description;
 	Date createdAt;
 	Date lastModifiedAt;
-	List<Label> label;
+	List<Label> labels;
 	String color;
-	Date setReminder;
+	Date reminder;
 	boolean isTrashed;
 	boolean archieve;
 	boolean pin;
@@ -53,12 +53,12 @@ public class ViewNoteDTO {
 		this.lastModifiedAt = lastModifiedAt;
 	}
 
-	public List<Label> getLabel() {
-		return label;
+	public List<Label> getLabels() {
+		return labels;
 	}
 
-	public void setLabel(List<Label> label) {
-		this.label = label;
+	public void setLabels(List<Label> labels) {
+		this.labels = labels;
 	}
 
 	public String getColor() {
@@ -69,12 +69,12 @@ public class ViewNoteDTO {
 		this.color = color;
 	}
 
-	public Date getSetReminder() {
-		return setReminder;
+	public Date getReminder() {
+		return reminder;
 	}
 
-	public void setSetReminder(Date setReminder) {
-		this.setReminder = setReminder;
+	public void setReminder(Date reminder) {
+		this.reminder = reminder;
 	}
 
 	public boolean isTrashed() {
@@ -113,8 +113,8 @@ public class ViewNoteDTO {
 	@Override
 	public String toString() {
 		return "ViewDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
-				+ createdAt + ", lastModifiedAt=" + lastModifiedAt + ", label=" + label + ", color=" + color
-				+ ", setReminder=" + setReminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
+				+ createdAt + ", lastModifiedAt=" + lastModifiedAt + ", labels=" + labels + ", color=" + color
+				+ ", reminder=" + reminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
 				+ pin + "]";
 	}
 

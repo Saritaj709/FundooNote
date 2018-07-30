@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.note.model;
 
 public class Response {
+	
 	private String message;
 	private int status;
 

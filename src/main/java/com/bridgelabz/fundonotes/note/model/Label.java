@@ -1,19 +1,13 @@
 package com.bridgelabz.fundonotes.note.model;
 
-import java.io.Serializable;
-
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.stereotype.Service;
 
 @Document(collection="label")
 @Service
-public class Label implements Serializable{
+public class Label {
 	
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	@Id
     String labelId;
     String labelName;

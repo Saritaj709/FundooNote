@@ -13,13 +13,12 @@ import com.bridgelabz.fundonotes.note.exception.NotePinnedException;
 import com.bridgelabz.fundonotes.note.exception.NoteTrashedException;
 import com.bridgelabz.fundonotes.note.exception.NoteUnArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteUnPinnedException;
-import com.bridgelabz.fundonotes.note.exception.NullEntryException;
+import com.bridgelabz.fundonotes.note.exception.NullValueException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
-import com.bridgelabz.fundonotes.note.exception.UserNotFoundException;
+import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
-import com.bridgelabz.fundonotes.note.model.CreateLabelDTO;
 import com.bridgelabz.fundonotes.note.model.Label;
-import com.bridgelabz.fundonotes.note.model.Note;
+import com.bridgelabz.fundonotes.note.model.LabelDTO;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
@@ -32,51 +31,51 @@ public interface NoteService {
 	 * @return Note
 	 * @throws NoteNotFoundException
 	 * @throws NoteCreationException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws DateException
 	 * @throws LabelNotFoundException
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	Note createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UserNotFoundException, DateException, LabelNotFoundException, NullEntryException;
+	ViewNoteDTO createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException, LabelNotFoundException, NullValueException;
 
 	/**
 	 * 
 	 * @param token
 	 * @param update
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteTrashedException
 	 */
-	void updateNote(String token,UpdateDTO update) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException;
+	void updateNote(String token,UpdateDTO update) throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException;
 
 	/**
 	 * 
 	 * @return List of Notes of A Particular user
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> readAllNotes() throws NullEntryException;
+	List<ViewNoteDTO> readAllNotes() throws NullValueException;
 	
 	/**
 	 * 
 	 * @param token
 	 * @param noteId
 	 * @return List of ViewNoteDTO
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteNotFoundException
 	 * @throws NoteTrashedException
 	 */
-	ViewNoteDTO findNoteById(String token,String noteId) throws UserNotFoundException, NoteNotFoundException, NoteTrashedException;
+	ViewNoteDTO findNoteById(String token,String noteId) throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException;
     
 	/**
 	 * 
 	 * @param token
 	 * @param noteId
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws UntrashedException
 	 * @throws NoteTrashedException
 	 */
-	void deleteNoteForever(String token,String noteId) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
+	void deleteNoteForever(String token,String noteId) throws NoteNotFoundException, UnAuthorizedException, UntrashedException, NoteTrashedException;
 
 	/**
 	 * 
@@ -84,79 +83,79 @@ public interface NoteService {
 	 * @param date
 	 * @param noteId
 	 * @return boolean 
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteNotFoundException
 	 * @throws NoteTrashedException
 	 * @throws DateException
 	 */
-	boolean addReminder(String token,Date date,String noteId) throws UserNotFoundException, NoteNotFoundException, NoteTrashedException, DateException;
+	void addReminder(String token,Date date,String noteId) throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException, DateException;
 
 	/**
 	 * 
 	 * @param token
 	 * @param noteId
-	 * @throws NullEntryException
-	 * @throws UserNotFoundException
+	 * @throws NullValueException
+	 * @throws UnAuthorizedException
 	 * @throws NoteNotFoundException
 	 * @throws NoteTrashedException
 	 */
-	void deleteReminder(String token,String noteId) throws NullEntryException, UserNotFoundException, NoteNotFoundException, NoteTrashedException;
+	void deleteReminder(String token,String noteId) throws NullValueException, UnAuthorizedException, NoteNotFoundException, NoteTrashedException;
 
 	/**
 	 * 
 	 * @param token
 	 * @param noteId
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteArchievedException
 	 * @throws NoteTrashedException
 	 * @throws NoteUnArchievedException 
 	 */
-	void archieveOrUnArchieveNote(String token, String noteId,boolean choice) throws NoteNotFoundException, UserNotFoundException, NoteArchievedException, NoteTrashedException, NoteUnArchievedException;
+	void archieveOrUnArchieveNote(String token, String noteId,boolean choice) throws NoteNotFoundException, UnAuthorizedException, NoteArchievedException, NoteTrashedException, NoteUnArchievedException;
 
 	/**
 	 * 
 	 * @param token
 	 * @param noteId
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NotePinnedException
 	 * @throws NoteTrashedException
 	 * @throws NoteUnPinnedException 
 	 */
-	void pinOrUnpinNote(String userId, String noteId,boolean choice) throws NoteNotFoundException, UserNotFoundException, NotePinnedException, NoteTrashedException, NoteUnPinnedException;
+	void pinOrUnpinNote(String userId, String noteId,boolean choice) throws NoteNotFoundException, UnAuthorizedException, NotePinnedException, NoteTrashedException, NoteUnPinnedException;
 
 	/**
 	 * 
 	 * @return List of Archived Notes
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewArchieved() throws NullEntryException;
+	List<ViewNoteDTO> viewArchieved() throws NullValueException;
 
 	/**
 	 * 
 	 * @return List of Pinned Notes
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewPinned() throws NullEntryException;
+	List<ViewNoteDTO> viewPinned() throws NullValueException;
 
 	/**
 	 * 
 	 * @return List of Trashed Notes
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewTrashed() throws NullEntryException;
+	List<ViewNoteDTO> viewTrashed() throws NullValueException;
 
 	/**
 	 * 
 	 * @param token
-	 * @param createLabelDto
+	 * @param labelName
 	 * @return Label
-	 * @throws UserNotFoundException
-	 * @throws NullEntryException
+	 * @throws UnAuthorizedException
+	 * @throws NullValueException
 	 * @throws NoteNotFoundException
 	 */
-	Label createLabel(String token, CreateLabelDTO createLabelDto) throws UserNotFoundException, NullEntryException, NoteNotFoundException;
+	LabelDTO createLabel(String token, String labelName) throws UnAuthorizedException, NullValueException, NoteNotFoundException;
 
 	/**
 	 * 
@@ -164,18 +163,18 @@ public interface NoteService {
 	 * @param labelId
 	 * @param noteId
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteTrashedException
 	 * @throws LabelAdditionException
 	 */
-	void addLabel(String token, String labelId, String noteId) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException, LabelAdditionException;
+	void addLabel(String token, String labelId, String noteId) throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException, LabelAdditionException;
 
 	/**
 	 * 
 	 * @return List of Labels
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	List<Label> viewLabels() throws NullEntryException;
+	List<Label> viewLabels() throws NullValueException;
 
 	/**
 	 * 
@@ -183,11 +182,11 @@ public interface NoteService {
 	 * @param noteId
 	 * @param choice
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws UntrashedException
 	 * @throws NoteTrashedException
 	 */
-	void deleteOrRestoreNote(String token, String noteId, boolean choice) throws NoteNotFoundException, UserNotFoundException, UntrashedException, NoteTrashedException;
+	void deleteOrRestoreNote(String token, String noteId, boolean choice) throws NoteNotFoundException, UnAuthorizedException, UntrashedException, NoteTrashedException;
 
 	/**
 	 * 
@@ -195,9 +194,9 @@ public interface NoteService {
 	 * @param labelName
 	 * @throws NoteNotFoundException
 	 * @throws LabelNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 */
-	void removeLabel(String userId, String labelName) throws NoteNotFoundException, LabelNotFoundException, UserNotFoundException;
+	void removeLabel(String userId, String labelName) throws NoteNotFoundException, LabelNotFoundException, UnAuthorizedException;
 
 	/**
 	 * 
@@ -205,9 +204,9 @@ public interface NoteService {
 	 * @param labelId
 	 * @param labelName
 	 * @throws LabelNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 */
-	void editLabel(String userId, String labelId, String labelName) throws LabelNotFoundException, UserNotFoundException;
+	void editLabel(String userId, String labelId, String labelName) throws LabelNotFoundException, UnAuthorizedException;
 
 	/**
 	 * 
@@ -215,10 +214,10 @@ public interface NoteService {
 	 * @param labelId
 	 * @return List of ViewNoteDTO
 	 * @throws LabelNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteNotFoundException
 	 */
-	List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UserNotFoundException, NoteNotFoundException;
+	List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UnAuthorizedException, NoteNotFoundException;
     
 	/**
 	 * 
@@ -227,17 +226,17 @@ public interface NoteService {
 	 * @param labelId
 	 * @throws LabelNotFoundException
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 */
-	void removeLabelFromNote(String userId, String noteId, String labelId) throws LabelNotFoundException, NoteNotFoundException, UserNotFoundException;
+	void removeLabelFromNote(String userId, String noteId, String labelId) throws LabelNotFoundException, NoteNotFoundException, UnAuthorizedException;
 
 	/**
 	 * 
 	 * @param userId
 	 * @return List of ViewNoteDTO
-	 * @throws NullEntryException
+	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> readUserNotes(String userId) throws NullEntryException;
+	List<ViewNoteDTO> readUserNotes(String userId) throws NullValueException;
 
 	/**
 	 * 
@@ -245,9 +244,17 @@ public interface NoteService {
 	 * @param color
 	 * @param noteId
 	 * @throws NoteNotFoundException
-	 * @throws UserNotFoundException
+	 * @throws UnAuthorizedException
 	 * @throws NoteTrashedException
 	 */
-	void addColor(String userId, String color, String noteId) throws NoteNotFoundException, UserNotFoundException, NoteTrashedException;
+	void addColor(String userId, String color, String noteId) throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException;
+
+	/**
+	 * 
+	 * @param userId
+	 * @return LabelDTO
+	 * @throws NullValueException 
+	 */
+	List<LabelDTO> viewUserLabels(String userId) throws NullValueException;
 
 }

@@ -1,18 +1,13 @@
 package com.bridgelabz.fundonotes.note.model;
 
-import java.io.Serializable;
 import java.util.List;
 
-public class UpdateDTO implements Serializable {
+public class UpdateDTO {
 
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
 	String title;
 	String description;
 	String noteId;
-    List<Label> label;
+    List<Label> labels;
 
 	public String getTitle() {
 		return title;
@@ -30,12 +25,12 @@ public class UpdateDTO implements Serializable {
 		this.description = description;
 	}
 
-	public List<Label> getLabel() {
-		return label;
+	public List<Label> getLabels() {
+		return labels;
 	}
 
-	public void setLabel(List<Label> label) {
-		this.label = label;
+	public void setLabels(List<Label> labels) {
+		this.labels = labels;
 	}
 
 	public String getNoteId() {
@@ -49,7 +44,7 @@ public class UpdateDTO implements Serializable {
 	@Override
 	public String toString() {
 		return "UpdateDTO [title=" + title + ", description=" + description + ", noteId="
-				+ noteId + ", label=" + label + "]";
+				+ noteId + ", labels=" + labels + "]";
 	}
 
 }

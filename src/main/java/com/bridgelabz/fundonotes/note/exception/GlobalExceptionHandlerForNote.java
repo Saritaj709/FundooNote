@@ -33,17 +33,17 @@ public class GlobalExceptionHandlerForNote {
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<Response> userNotFoundExceptionHandler(UserNotFoundException e) {
-		logger.error("User not found error");
+	@ExceptionHandler(UnAuthorizedException.class)
+	public ResponseEntity<Response> userNotFoundExceptionHandler(UnAuthorizedException e) {
+		logger.error("UnAuthorized error");
 		Response response = new Response();
-		response.setMessage("User not found exception, " + e.getMessage());
+		response.setMessage("UnAuthorized exception, " + e.getMessage());
 		response.setStatus(301);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
-	@ExceptionHandler(NullEntryException.class)
-	public ResponseEntity<Response> nullEntryExceptionHandler(NullEntryException e) {
+	@ExceptionHandler(NullValueException.class)
+	public ResponseEntity<Response> nullEntryExceptionHandler(NullValueException e) {
 		logger.error("null value error");
 		Response response = new Response();
 		response.setMessage("null value exception, " + e.getMessage());
