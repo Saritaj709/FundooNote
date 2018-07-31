@@ -1,11 +1,13 @@
 package com.bridgelabz.fundonotes.note.model;
 
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Service;
+import org.springframework.data.elasticsearch.annotations.Document;
+//import org.springframework.data.mongodb.core.mapping.Document;
+//import org.springframework.stereotype.Service;
 
-@Document(collection="label")
-@Service
+/*@Document(collection="labels")
+@Service*/
+@Document(indexName="labeldb",type="label")
 public class Label {
 	
 	@Id

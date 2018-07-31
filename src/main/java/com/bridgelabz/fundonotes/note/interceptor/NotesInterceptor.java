@@ -22,7 +22,7 @@ public class NotesInterceptor implements HandlerInterceptor {
 	@Override
 	public boolean preHandle(HttpServletRequest request,HttpServletResponse response,Object object) {
 		
-		String token=request.getHeader("token");
+		String token=request.getHeader("Authorization");
 		if(userRepository.findById(jwtToken.parseJwtToken(token)).isPresent()) {
 		request.setAttribute("userId",jwtToken.parseJwtToken(token));
 			return true;
