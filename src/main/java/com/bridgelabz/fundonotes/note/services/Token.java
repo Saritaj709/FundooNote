@@ -4,6 +4,7 @@ import java.util.Date;
 
 import javax.xml.bind.DatatypeConverter;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import io.jsonwebtoken.Claims;
@@ -14,7 +15,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class Token {
 
-	private final static String KEY = "Sarita";
+	@Value("${Key}")
+	static String Key;
+	
+	private final static String KEY = Key;
 
 	// Generate token for string
 	public String tokenGenerator(String email) {

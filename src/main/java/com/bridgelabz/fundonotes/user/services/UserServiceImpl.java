@@ -10,11 +10,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.bridgelabz.fundonotes.note.repository.RedisRepository;
 import com.bridgelabz.fundonotes.user.exception.ActivationException;
 import com.bridgelabz.fundonotes.user.exception.LoginException;
 import com.bridgelabz.fundonotes.user.exception.RegistrationException;
 import com.bridgelabz.fundonotes.user.exception.UserNotFoundException;
-import com.bridgelabz.fundonotes.user.mail.MailService;
 import com.bridgelabz.fundonotes.user.model.LoginDTO;
 import com.bridgelabz.fundonotes.user.model.MailDTO;
 import com.bridgelabz.fundonotes.user.model.PasswordDTO;
@@ -38,6 +38,9 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private ProducerService producer;
 	
+	/*@Autowired
+	private MailService mailService;*/
+	
 	@Autowired
 	private JwtToken jwtToken;
 	
@@ -50,9 +53,9 @@ public class UserServiceImpl implements UserService {
 	@Value("${Key}")
     private String Key;
 	
-	/*@Autowired
-	private MailService mailService;*/
-    
+	@Autowired
+	private RedisRepository redisRepository; 
+	
 	@Override
 	public List<User> getAllUsers() {
 
@@ -198,28 +201,34 @@ public class UserServiceImpl implements UserService {
 			throw new UserNotFoundException("User is not present");
 		}
 
-		String generatedToken = jwtToken.tokenGenerator(id);
-		System.out.println(generatedToken);
+		String uuid=UserUtility.generateUUId();
+		redisRepository.saveInRedis(uuid,id);
+
+		/*String generatedToken = jwtToken.tokenGenerator(id);
+		System.out.println(generatedToken);*/
 
 		MailDTO mail = new MailDTO();
 		mail.setTo(user.get().getEmail());
 		mail.setSubject("Password reset mail");
-		mail.setText(passwordResetLink  + generatedToken);
+		mail.setText(passwordResetLink  + uuid);
 
 		producer.sender(mail);
+		//mailService.sendMail(mail);
 	}
 
 	@Override
-	public void passwordReset(String token, PasswordDTO dto) throws UserNotFoundException, RegistrationException {
+	public void passwordReset(String uuid, PasswordDTO dto) throws UserNotFoundException, RegistrationException {
 		
 		UserUtility.validateReset(dto);
 		
-		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(Key)).parseClaimsJws(token)
+	/*	Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(Key)).parseClaimsJws(token)
 				.getBody();
 		
-		System.out.println("Subject : " + claims.getSubject());
+		System.out.println("Subject : " + claims.getSubject());*/
+		
+		String userId= redisRepository.getFromRedis(uuid);
 
-		Optional<User> user = userRepository.findById(claims.getSubject());
+		Optional<User> user = userRepository.findById(userId);
 
 		if (!user.isPresent()) {
 			throw new UserNotFoundException("User not found");

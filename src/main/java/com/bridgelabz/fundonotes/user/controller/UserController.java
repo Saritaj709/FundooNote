@@ -34,7 +34,6 @@ public class UserController {
 
 	@Autowired
 	private UserService userService;
-
 	
 	public static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
@@ -149,8 +148,8 @@ public class UserController {
 	@RequestMapping(value = "/forgotpassword", method = RequestMethod.POST)
 	public ResponseEntity<ResponseDTO> forgetPassword(@RequestParam(value="id") String id) throws UserNotFoundException {
 
-		userService.forgetPassword(id);
-
+	    userService.forgetPassword(id);
+	    System.out.println(id);
 		ResponseDTO response = new ResponseDTO();
 		response.setMessage("link sent to email,pls check and verify");
 		response.setStatus(1);

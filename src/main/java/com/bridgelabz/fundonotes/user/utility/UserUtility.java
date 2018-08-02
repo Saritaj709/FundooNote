@@ -1,5 +1,7 @@
 package com.bridgelabz.fundonotes.user.utility;
 
+import java.util.UUID;
+
 import com.bridgelabz.fundonotes.user.exception.LoginException;
 import com.bridgelabz.fundonotes.user.exception.RegistrationException;
 import com.bridgelabz.fundonotes.user.model.LoginDTO;
@@ -44,5 +46,10 @@ public class UserUtility {
 		if (!email.matches(EMAIL)) {
 			throw new LoginException("Invalid email format");
 		}
+	}
+
+	public static String generateUUId(){
+		UUID uuid = UUID.randomUUID();
+		return uuid.toString();
 	}
 }
