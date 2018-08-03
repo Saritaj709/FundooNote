@@ -24,12 +24,12 @@ public interface UserService {
 
 	public void deleteUser(String email) throws UserNotFoundException;
 
-	public boolean activateJwt(String token);
+	public void activateJwt(String token);
 
 	public void forgetPassword(String id) throws UserNotFoundException;
 	
 	public void passwordReset(String token,PasswordDTO dto) throws RegistrationException, Exception;
 
-	boolean activate(String token) throws UserNotFoundException;
+	void activate(String token) throws UserNotFoundException;
 
 }

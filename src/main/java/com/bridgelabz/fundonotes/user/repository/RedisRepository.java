@@ -1,4 +1,4 @@
-package com.bridgelabz.fundonotes.note.repository;
+package com.bridgelabz.fundonotes.user.repository;
 
 public interface RedisRepository {
 

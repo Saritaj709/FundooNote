@@ -27,14 +27,14 @@ import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.LabelDTO;
 import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
-import com.bridgelabz.fundonotes.note.services.NoteService;
+import com.bridgelabz.fundonotes.note.services.LabelService;
 
 @RestController
 @RequestMapping("/api/labels")
 public class LabelController {
 
 	@Autowired
-	private NoteService noteService;
+	private LabelService labelService;
 	
 	// ------------------Create A Label--------------------------
 
@@ -55,7 +55,7 @@ public class LabelController {
 
 			String userId = (String) req.getAttribute("userId");
             
-			LabelDTO labelDto = noteService.createLabel(userId, labelName);
+			LabelDTO labelDto = labelService.createLabel(userId, labelName);
 
 			return new ResponseEntity<>(labelDto, HttpStatus.CREATED);
 		}
@@ -74,9 +74,9 @@ public class LabelController {
 		public ResponseEntity<List<Label>> viewAllLabels()
 				throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException, NullValueException {
 
-			noteService.viewLabels();
+			labelService.viewLabels();
 
-			return new ResponseEntity<>(noteService.viewLabels(), HttpStatus.OK);
+			return new ResponseEntity<>(labelService.viewLabels(), HttpStatus.OK);
 		}
 		
 		//-------------------View Labels Of A Particular Label--------------------------
@@ -86,8 +86,8 @@ public class LabelController {
 			
 			String userId=(String) req.getAttribute("userId");
 			
-			noteService.viewUserLabels(userId);
-			return new ResponseEntity<>(noteService.viewUserLabels(userId),HttpStatus.OK);
+			labelService.viewUserLabels(userId);
+			return new ResponseEntity<>(labelService.viewUserLabels(userId),HttpStatus.OK);
 		}
 		
 
@@ -110,9 +110,9 @@ public class LabelController {
 				NoteTrashedException, NullValueException, LabelNotFoundException {
 
 			String userId = (String) req.getAttribute("userId");
-			noteService.viewLabel(userId, labelId);
+			labelService.viewLabel(userId, labelId);
 
-			return new ResponseEntity<>(noteService.viewLabel(userId, labelId), HttpStatus.OK);
+			return new ResponseEntity<>(labelService.viewLabel(userId, labelId), HttpStatus.OK);
 		}
 
 		// ---------------Add Label To Notes-----------------------
@@ -135,7 +135,7 @@ public class LabelController {
 
 			String userId = (String) req.getAttribute("userId");
 
-			noteService.addLabel(userId, labelId, noteId);
+			labelService.addLabel(userId, labelId, noteId);
 
 			Response response = new Response();
 
@@ -160,7 +160,7 @@ public class LabelController {
 
 			String userId = (String) req.getAttribute("userId");
 
-			noteService.removeLabel(userId, labelId);
+			labelService.removeLabel(userId, labelId);
 
 			Response response = new Response();
 
@@ -187,7 +187,7 @@ public class LabelController {
 
 			String userId = (String) req.getAttribute("userId");
 
-			noteService.removeLabelFromNote(userId, noteId, labelId);
+			labelService.removeLabelFromNote(userId, noteId, labelId);
 
 			Response response = new Response();
 
@@ -213,7 +213,7 @@ public class LabelController {
 
 			String userId = (String) req.getAttribute("userId");
 
-			noteService.editLabel(userId, labelId, labelName);
+			labelService.editLabel(userId, labelId, labelName);
 
 			Response response = new Response();
 

@@ -166,12 +166,13 @@ public class NoteController {
 	 * @throws NullValueException
 	 */
 	@GetMapping("/view-trashed")
-	public ResponseEntity<List<ViewNoteDTO>> viewTrashedNotes()
+	public ResponseEntity<List<ViewNoteDTO>> viewTrashedNotes(HttpServletRequest req)
 			throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException, NullValueException {
 
-		noteService.viewTrashed();
+		String userId=(String) req.getAttribute("userId");
+		noteService.viewTrashed(userId);
 
-		return new ResponseEntity<>(noteService.viewTrashed(), HttpStatus.OK);
+		return new ResponseEntity<>(noteService.viewTrashed(userId), HttpStatus.OK);
 	}
 
 	// ------------------Move To Trash Or Restore A Note-----------------------
@@ -287,11 +288,12 @@ public class NoteController {
 	 * @throws NullValueException
 	 */
 	@GetMapping(value = "/view-archived-notes")
-	public ResponseEntity<List<ViewNoteDTO>> viewArchievedNotes() throws NullValueException {
+	public ResponseEntity<List<ViewNoteDTO>> viewArchievedNotes(HttpServletRequest req) throws NullValueException {
 
-		noteService.viewArchieved();
+		String userId=(String) req.getAttribute("userId");
+		noteService.viewArchieved(userId);
 
-		return new ResponseEntity<>(noteService.viewArchieved(), HttpStatus.OK);
+		return new ResponseEntity<>(noteService.viewArchieved(userId), HttpStatus.OK);
 	}
 
 	// -------------------To Pin Or Unpin Notes---------------------------------
@@ -339,11 +341,12 @@ public class NoteController {
 	 * @throws NullValueException
 	 */
 	@GetMapping(value = "/view-pinned-notes")
-	public ResponseEntity<List<ViewNoteDTO>> viewPinnedNotes() throws NullValueException {
+	public ResponseEntity<List<ViewNoteDTO>> viewPinnedNotes(HttpServletRequest req) throws NullValueException {
 
-		noteService.viewPinned();
+		String userId=(String) req.getAttribute("userId");
+		noteService.viewPinned(userId);
 
-		return new ResponseEntity<>(noteService.viewPinned(), HttpStatus.OK);
+		return new ResponseEntity<>(noteService.viewPinned(userId), HttpStatus.OK);
 	}
 
 	// ----------------Read Entire Details Of All The Notes------------

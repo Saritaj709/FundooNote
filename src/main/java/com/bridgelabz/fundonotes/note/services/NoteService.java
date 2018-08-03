@@ -17,8 +17,6 @@ import com.bridgelabz.fundonotes.note.exception.NullValueException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
-import com.bridgelabz.fundonotes.note.model.Label;
-import com.bridgelabz.fundonotes.note.model.LabelDTO;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
@@ -130,21 +128,21 @@ public interface NoteService {
 	 * @return List of Archived Notes
 	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewArchieved() throws NullValueException;
+	List<ViewNoteDTO> viewArchieved(String userId) throws NullValueException;
 
 	/**
 	 * 
 	 * @return List of Pinned Notes
 	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewPinned() throws NullValueException;
+	List<ViewNoteDTO> viewPinned(String userId) throws NullValueException;
 
 	/**
 	 * 
 	 * @return List of Trashed Notes
 	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewTrashed() throws NullValueException;
+	List<ViewNoteDTO> viewTrashed(String userId) throws NullValueException;
 
 	/**
 	 * 
@@ -154,10 +152,10 @@ public interface NoteService {
 	 * @throws UnAuthorizedException
 	 * @throws NullValueException
 	 * @throws NoteNotFoundException
-	 */
+	 *//*
 	LabelDTO createLabel(String token, String labelName) throws UnAuthorizedException, NullValueException, NoteNotFoundException;
 
-	/**
+	*//**
 	 * 
 	 * @param token
 	 * @param labelId
@@ -173,10 +171,10 @@ public interface NoteService {
 	 * 
 	 * @return List of Labels
 	 * @throws NullValueException
-	 */
+	 *//*
 	List<Label> viewLabels() throws NullValueException;
 
-	/**
+	*//**
 	 * 
 	 * @param token
 	 * @param noteId
@@ -195,20 +193,20 @@ public interface NoteService {
 	 * @throws NoteNotFoundException
 	 * @throws LabelNotFoundException
 	 * @throws UnAuthorizedException
-	 */
+	 *//*
 	void removeLabel(String userId, String labelName) throws NoteNotFoundException, LabelNotFoundException, UnAuthorizedException;
 
-	/**
+	*//**
 	 * 
 	 * @param userId
 	 * @param labelId
 	 * @param labelName
 	 * @throws LabelNotFoundException
 	 * @throws UnAuthorizedException
-	 */
+	 *//*
 	void editLabel(String userId, String labelId, String labelName) throws LabelNotFoundException, UnAuthorizedException;
 
-	/**
+	*//**
 	 * 
 	 * @param userId
 	 * @param labelId
@@ -216,10 +214,10 @@ public interface NoteService {
 	 * @throws LabelNotFoundException
 	 * @throws UnAuthorizedException
 	 * @throws NoteNotFoundException
-	 */
+	 *//*
 	List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UnAuthorizedException, NoteNotFoundException;
     
-	/**
+	*//**
 	 * 
 	 * @param userId
 	 * @param noteId
@@ -254,7 +252,7 @@ public interface NoteService {
 	 * @param userId
 	 * @return LabelDTO
 	 * @throws NullValueException 
-	 */
-	List<LabelDTO> viewUserLabels(String userId) throws NullValueException;
+	 *//*
+	List<LabelDTO> viewUserLabels(String userId) throws NullValueException;*/
 
 }

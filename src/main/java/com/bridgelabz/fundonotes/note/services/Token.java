@@ -15,10 +15,10 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class Token {
 
-	@Value("${Key}")
+	/*@Value("${Key}")
 	static String Key;
-	
-	private final static String KEY = Key;
+	*/
+	private final static String KEY = "Sarita";
 
 	// Generate token for string
 	public String tokenGenerator(String email) {

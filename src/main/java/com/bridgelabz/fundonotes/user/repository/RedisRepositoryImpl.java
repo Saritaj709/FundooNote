@@ -1,4 +1,4 @@
-package com.bridgelabz.fundonotes.note.services;
+package com.bridgelabz.fundonotes.user.repository;
 
 import javax.annotation.PostConstruct;
 
@@ -7,12 +7,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Repository;
-import com.bridgelabz.fundonotes.note.repository.RedisRepository;
 
 @Repository
 public class RedisRepositoryImpl implements RedisRepository{
-	
-	private final String KEY="Sarita";
+
+	@Value("${Key}")
+	private String KEY;
 			
 	private RedisTemplate<String, String> redisTemplate;
 	private HashOperations<String,String,String> hashOperations;
@@ -28,8 +28,6 @@ public class RedisRepositoryImpl implements RedisRepository{
 	@Override
 	public void saveInRedis(String randomString,String userId) {
      
-		/*String randomString=randomStringUUID.generateUUId();
-		System.out.println(randomString);*/
 		hashOperations.put(KEY,randomString, userId);
 		
 	}

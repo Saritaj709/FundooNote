@@ -55,19 +55,11 @@ public class UserController {
 
 		ResponseDTO response = new ResponseDTO();
 
-		if (userService.activateJwt(token)) {
-
 			response.setMessage("Account activated successfully");
 			response.setStatus(1);
 
 			return new ResponseEntity<>(response, HttpStatus.OK);
-		} else {
 
-			response.setMessage("Account not yet activated");
-			response.setStatus(-1);
-
-			return new ResponseEntity<>(response, HttpStatus.FORBIDDEN);
-		}
 	}
 	
 	//----------------Activate USer Using RequestParam------------

@@ -6,20 +6,22 @@ import java.util.Optional;
 import javax.xml.bind.DatatypeConverter;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import com.bridgelabz.fundonotes.note.repository.RedisRepository;
 import com.bridgelabz.fundonotes.user.exception.ActivationException;
 import com.bridgelabz.fundonotes.user.exception.LoginException;
 import com.bridgelabz.fundonotes.user.exception.RegistrationException;
 import com.bridgelabz.fundonotes.user.exception.UserNotFoundException;
+import com.bridgelabz.fundonotes.user.mail.MailService;
 import com.bridgelabz.fundonotes.user.model.LoginDTO;
 import com.bridgelabz.fundonotes.user.model.MailDTO;
 import com.bridgelabz.fundonotes.user.model.PasswordDTO;
 import com.bridgelabz.fundonotes.user.model.RegistrationDTO;
 import com.bridgelabz.fundonotes.user.model.User;
+import com.bridgelabz.fundonotes.user.repository.ElasticRepositoryForUser;
+import com.bridgelabz.fundonotes.user.repository.RedisRepository;
 import com.bridgelabz.fundonotes.user.repository.UserRepository;
 import com.bridgelabz.fundonotes.user.utility.UserUtility;
 
@@ -30,28 +32,25 @@ import io.jsonwebtoken.Jwts;
 public class UserServiceImpl implements UserService {
 
 	@Autowired
-	UserRepository userRepository; // extends mongoRepository
+	private UserRepository userRepository; // extends mongoRepository
 
 	@Autowired
-	PasswordEncoder passwordEncoder;
+	private PasswordEncoder passwordEncoder;
 
 	@Autowired
 	private ProducerService producer;
+	
+	@Autowired
+	private ElasticRepositoryForUser userElasticRepository;
 	
 	/*@Autowired
 	private MailService mailService;*/
 	
 	@Autowired
+	private Environment environment;
+	
+	@Autowired
 	private JwtToken jwtToken;
-	
-	@Value("${accountActivationLink}")
-	private String accountActivationLink;
-	
-	@Value("${passwordResetLink}")
-	private String passwordResetLink;
-	
-	@Value("${Key}")
-    private String Key;
 	
 	@Autowired
 	private RedisRepository redisRepository; 
@@ -81,6 +80,7 @@ public class UserServiceImpl implements UserService {
 		user.setPhoneNo(dto.getPhoneNo());
 		user.setPassword(passwordEncoder.encode(dto.getPassword()));
 		userRepository.insert(user);
+		userElasticRepository.save(user);
 
 		String jwt = jwtToken.tokenGenerator(user.getId());
 		
@@ -89,8 +89,7 @@ public class UserServiceImpl implements UserService {
 		MailDTO mail = new MailDTO();
 		mail.setTo(dto.getEmail());
 		mail.setSubject("Account activation mail");
-		mail.setText(accountActivationLink  + jwt);
-		//mail.setText("Click here to verify your account:\\n\\n\" + \"http://192.168.0.73:8080/user/activateaccount/?token="+ jwt);
+		mail.setText(environment.getProperty("accountActivationLink") + jwt);
 		producer.sender(mail);
         //mailService.sendMail(mail);
 		return jwt;
@@ -99,7 +98,9 @@ public class UserServiceImpl implements UserService {
 	@Override
 	public void getUserById(String id) throws UserNotFoundException {
 
-		Optional<User> checkUser = userRepository.findById(id);
+		//Optional<User> checkUser = userRepository.findById(id);
+		Optional<User> checkUser = userElasticRepository.findById(id);
+		
 		if (!checkUser.isPresent()) {
 			throw new UserNotFoundException("User is not available");
 		}
@@ -110,7 +111,8 @@ public class UserServiceImpl implements UserService {
 
 		UserUtility.validateLogin(loginDto);
 
-		Optional<User> checkUser = userRepository.findByEmail(loginDto.getEmail());
+		//Optional<User> checkUser = userRepository.findByEmail(loginDto.getEmail());
+		Optional<User> checkUser = userElasticRepository.findByEmail(loginDto.getEmail());
 
 		if (!checkUser.isPresent()) {
 			throw new UserNotFoundException("This Email id does not exist");
@@ -145,57 +147,68 @@ public class UserServiceImpl implements UserService {
 		user.setPhoneNo(checkUser.get().getPhoneNo());
 		user.setPassword(passwordEncoder.encode(checkUser.get().getPassword()));
 		userRepository.save(user);
+		userElasticRepository.save(user);
 
 		JwtToken jwtToken=new JwtToken();
 		String jwt = jwtToken.tokenGenerator(user.getEmail());
-		System.out.println(jwtToken);
 		return jwt;
 	}
 
 	@Override
 	public void deleteUser(String email) throws UserNotFoundException {
 
-		Optional<User> checkUser = userRepository.findByEmail(email);
+		//Optional<User> checkUser = userRepository.findByEmail(email);
+		Optional<User> checkUser = userElasticRepository.findByEmail(email);
+
 		if (!checkUser.isPresent()) {
 			throw new UserNotFoundException("User not found");
 		}
 		userRepository.deleteByEmail(email);
+		userElasticRepository.deleteByEmail(email);
+
 		
 	}
 
 	@Override
-	public boolean activateJwt(String token) {
+	public void activateJwt(String token) {
 
-		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(Key)).parseClaimsJws(token)
+		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(environment.getProperty("Key"))).parseClaimsJws(token)
 				.getBody();
 
-		Optional<User> user = userRepository.findById(claims.getSubject());
+		//Optional<User> user = userRepository.findById(claims.getSubject());
+		Optional<User> user = userElasticRepository.findById(claims.getSubject());
+
 		user.get().setActivate(true);
 		userRepository.save(user.get());
-		return true;
+		userElasticRepository.save(user.get());
+
 	}
 
 	
 	@Override
-	public boolean activate(String token) throws UserNotFoundException {
-		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(Key)).parseClaimsJws(token)
+	public void activate(String token) throws UserNotFoundException {
+		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(environment.getProperty("Key"))).parseClaimsJws(token)
 				.getBody();
 
-		Optional<User> user = userRepository.findById(claims.getSubject());
-		
+		//Optional<User> user = userRepository.findById(claims.getSubject());
+		Optional<User> user = userElasticRepository.findById(claims.getSubject());
+
 		if(!claims.getSubject().equals(user.get().getId())) {
 	 	throw new UserNotFoundException("User not found");
 		}
 		
 		user.get().setActivate(true);
 		userRepository.save(user.get());
-		return true;
+		userElasticRepository.save(user.get());
+
 	}
 
 	@Override
 	public void forgetPassword(String id) throws UserNotFoundException {
 
-		Optional<User> user = userRepository.findById(id);
+	//	Optional<User> user = userRepository.findById(id);
+		Optional<User> user = userElasticRepository.findById(id);
+
 
 		if (!user.isPresent()) {
 			throw new UserNotFoundException("User is not present");
@@ -204,13 +217,10 @@ public class UserServiceImpl implements UserService {
 		String uuid=UserUtility.generateUUId();
 		redisRepository.saveInRedis(uuid,id);
 
-		/*String generatedToken = jwtToken.tokenGenerator(id);
-		System.out.println(generatedToken);*/
-
 		MailDTO mail = new MailDTO();
 		mail.setTo(user.get().getEmail());
 		mail.setSubject("Password reset mail");
-		mail.setText(passwordResetLink  + uuid);
+		mail.setText(environment.getProperty("passwordResetLink")  + uuid);
 
 		producer.sender(mail);
 		//mailService.sendMail(mail);
@@ -221,14 +231,11 @@ public class UserServiceImpl implements UserService {
 		
 		UserUtility.validateReset(dto);
 		
-	/*	Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(Key)).parseClaimsJws(token)
-				.getBody();
-		
-		System.out.println("Subject : " + claims.getSubject());*/
-		
 		String userId= redisRepository.getFromRedis(uuid);
 
-		Optional<User> user = userRepository.findById(userId);
+		//Optional<User> user = userRepository.findById(userId);
+		Optional<User> user = userElasticRepository.findById(userId);
+
 
 		if (!user.isPresent()) {
 			throw new UserNotFoundException("User not found");
@@ -236,5 +243,7 @@ public class UserServiceImpl implements UserService {
 
 		user.get().setPassword(passwordEncoder.encode(dto.getPassword()));
 		userRepository.save(user.get());
+		userElasticRepository.save(user.get());
+
 	}
 }

@@ -1,18 +1,10 @@
 package com.bridgelabz.fundonotes.user.model;
 
-import java.io.Serializable;
-
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.Document;
-import org.springframework.stereotype.Component;
+import org.springframework.data.elasticsearch.annotations.Document;
 
-@Component
-@Document(collection = "FundooNotes")
-public class User implements Serializable {
-	/**
-	 * 
-	 */
-	private static final long serialVersionUID = 1L;
+@Document(indexName = "userdb",type="user")
+public class User {
 	
 	@Id
 	private String id;

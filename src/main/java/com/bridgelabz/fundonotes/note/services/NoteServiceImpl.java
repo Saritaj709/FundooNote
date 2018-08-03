@@ -1,19 +1,19 @@
 package com.bridgelabz.fundonotes.note.services;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
-import com.bridgelabz.fundonotes.note.exception.LabelCreationException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
 import com.bridgelabz.fundonotes.note.exception.NoSuchLabelException;
 import com.bridgelabz.fundonotes.note.exception.NoteArchievedException;
@@ -28,13 +28,11 @@ import com.bridgelabz.fundonotes.note.exception.UntrashedException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.Label;
-import com.bridgelabz.fundonotes.note.model.LabelDTO;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.repository.ElasticRepositoryForLabel;
 import com.bridgelabz.fundonotes.note.repository.ElasticRepositoryForNote;
-import com.bridgelabz.fundonotes.note.repository.LabelRepository;
 import com.bridgelabz.fundonotes.note.repository.NoteRepository;
 import com.bridgelabz.fundonotes.note.utility.NoteUtility;
 
@@ -42,25 +40,22 @@ import com.bridgelabz.fundonotes.note.utility.NoteUtility;
 public class NoteServiceImpl implements NoteService {
 
 	@Autowired
-	NoteRepository noteRepository;
-
-	@Autowired
-	Token jwtToken;
-
-	@Autowired
-	ModelMapper modelMapper;
-
-	@Autowired
-	LabelRepository labelRepository;
+	private NoteRepository noteRepository;
 	
 	@Autowired
-	ElasticRepositoryForLabel labelElasticRepository;
+	private ModelMapper modelMapper;
+
+	@Autowired
+	private ElasticRepositoryForLabel labelElasticRepository;
 	
 	@Autowired
-	ElasticRepositoryForNote noteElasticRepository;
-
-	@Value("${Color}")
-	String Color;
+	private ElasticRepositoryForNote noteElasticRepository;
+	
+	@Autowired
+	private LabelService labelService;
+	
+	@Autowired
+	private Environment environment;
 
 	/**
 	 * 
@@ -84,7 +79,7 @@ public class NoteServiceImpl implements NoteService {
 
 		if (createDto.getColor().equals(null) || createDto.getColor().length() == 0
 				|| createDto.getColor().trim().length() == 0) {
-			note.setColor(Color);
+			note.setColor(environment.getProperty("Color"));
 		}
 		
 		if (createDto.getReminder().before(new Date())) {
@@ -98,14 +93,11 @@ public class NoteServiceImpl implements NoteService {
 
 		for (int i = 0; i < createDto.getLabels().size(); i++) {
 
-			//List<Label> labels = labelRepository.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(),userId);
-
 			List<Label> labels = labelElasticRepository.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(),userId);
 			
 			if (labels.isEmpty()) {
 			
-				createLabel(userId, createDto.getLabels().get(i).getLabelName());
-				//List<Label> labels1 = labelRepository.findByLabelName(createDto.getLabels().get(i).getLabelName());
+				labelService.createLabel(userId, createDto.getLabels().get(i).getLabelName());
 				
 				List<Label> labels1 = labelElasticRepository.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(),userId);
 				
@@ -123,42 +115,7 @@ public class NoteServiceImpl implements NoteService {
 		return viewNoteDto;
 
 	}
-
-	/**
-	 * 
-	 * @param token
-	 * @param createLabelDto
-	 * @return Label
-	 * @throws UnAuthorizedException
-	 * @throws NullValueException
-	 * @throws NoteNotFoundException
-	 */
-	@Override
-	public LabelDTO createLabel(String userId,String labelName)
-			throws UnAuthorizedException, NullValueException, NoteNotFoundException {
-
-		NoteUtility.validateLabelCreation(labelName);
-
-		//List<Label> labels = labelRepository.findByLabelNameAndUserId(labelName,userId);
-
-		List<Label> labels = labelElasticRepository.findByLabelNameAndUserId(labelName,userId);
-
-		if (!labels.isEmpty()) {
-			throw new LabelCreationException("label with this name already exists");
-		}
-
-		Label label = new Label();
-		label.setLabelName(labelName);
-		label.setUserId(userId);
-
-		labelRepository.save(label);
-		
-		labelElasticRepository.save(label);
-		LabelDTO labelDto=modelMapper.map(label,LabelDTO.class);
-
-		return labelDto;
-	}
-
+	
 	/**
 	 * 
 	 * @param token
@@ -173,21 +130,20 @@ public class NoteServiceImpl implements NoteService {
 	public void addLabel(String userId, String labelId, String noteId)
 			throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException, LabelAdditionException {
 
-		//Optional<Note> checkNote = noteRepository.findById(noteId);
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 		
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("The note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
 		Note note=checkNote.get();
 
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("this note no longer exists");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 		//List<Label> labels = labelRepository.findByLabelIdAndUserId(labelId,userId);
@@ -195,7 +151,7 @@ public class NoteServiceImpl implements NoteService {
 		List<Label> labels = labelElasticRepository.findByLabelIdAndUserId(labelId,userId);
 		
 		if (labels.isEmpty()) {
-			throw new NoSuchLabelException("The label with the given id does not exist for given user");
+			throw new NoSuchLabelException(environment.getProperty("NoSuchLabelException"));
 		}
 	
 		List<Label> tempList = new LinkedList<>();
@@ -206,8 +162,8 @@ public class NoteServiceImpl implements NoteService {
 
 			for (int i = 0; i < tempList.size(); i++) {
 
-				if (tempList.get(i).getLabelId().equalsIgnoreCase(labelId)) {
-					throw new LabelAdditionException("the label with this labelId already exists");
+				if (tempList.get(i).getLabelId().equals(labelId)) {
+					throw new LabelAdditionException(environment.getProperty("LabelAdditionException"));
 				}
 			}
 			tempList.addAll(labels);
@@ -222,118 +178,6 @@ public class NoteServiceImpl implements NoteService {
 		
 		noteElasticRepository.save(note);
 
-	}
-
-	/**
-	 * 
-	 * @return List of Labels
-	 * @throws NullValueException
-	 */
-	@Override
-	public List<Label> viewLabels() throws NullValueException {
-
-		//List<Label> labelList = labelRepository.findAll();
-
-		List<Label> labelList = (List<Label>) labelElasticRepository.findAll();
-
-		if (labelList == null) {
-			throw new NullValueException("There is no any details stored in note yet");
-		}
-
-		return labelList;
-	}
-
-	/**
-	 * 
-	 * @param userId
-	 * @param labelId
-	 * @return List of ViewNoteDTO
-	 * @throws LabelNotFoundException
-	 * @throws UnAuthorizedException
-	 * @throws NoteNotFoundException
-	 */
-	@Override
-	public List<ViewNoteDTO> viewLabel(String userId, String labelId)
-			throws LabelNotFoundException, UnAuthorizedException, NoteNotFoundException {
-
-		//Optional<Label> optionalLabel = labelRepository.findByLabelId(labelId);
-		Optional<Label> optionalLabel = labelElasticRepository.findByLabelId(labelId);
-		if (!optionalLabel.isPresent()) {
-			throw new LabelNotFoundException("The label with the given id does not exist");
-		}
-		
-		Label label=optionalLabel.get();
-
-		if (!label.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("The user with the given id does not exist");
-		}
-
-	//	ArrayList<Note> noteList = (ArrayList<Note>) noteRepository.findAllByUserId(userId);
-       
-		List<Note> noteList =noteElasticRepository.findAllByUserId(userId);
-
-		if (noteList == null) {
-			throw new NoteNotFoundException("no such note available");
-		}
-
-		ArrayList<ViewNoteDTO> viewList = new ArrayList<>();
-		for (int i = 0; i < noteList.size(); i++) {
-			Note note = noteList.get(i);
-
-			for (int j = 0; j < note.getLabels().size(); j++) {
-				if (note.getLabels().get(j).getLabelId().equals(labelId)) {
-
-					ViewNoteDTO viewDto = modelMapper.map(noteList.get(i), ViewNoteDTO.class);
-
-					viewList.add(viewDto);
-
-				}
-			}
-		}
-
-		return viewList;
-	}
-
-	/**
-	 * 
-	 * @param userId
-	 * @param labelName
-	 * @throws NoteNotFoundException
-	 * @throws LabelNotFoundException
-	 * @throws UnAuthorizedException
-	 */
-	@Override
-	public void removeLabel(String userId, String labelId)
-			throws NoteNotFoundException, LabelNotFoundException, UnAuthorizedException {
-
-		//Optional<Label> optionalLabel = labelRepository.findByLabelId(labelId);
-		Optional<Label> optionalLabel = labelElasticRepository.findByLabelId(labelId);
-		
-		if (!optionalLabel.isPresent()) {
-			throw new LabelNotFoundException("label is not present in list");
-		}
-        
-		Label label=optionalLabel.get();
-		
-		if (!label.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("the user with given id is not found");
-		}
-		
-		//List<Note> noteList = noteRepository.findAllByUserId(userId);
-		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
-		for (int i = 0; i < noteList.size(); i++) {
-			Note note = noteList.get(i);
-			for (int j = 0; j < note.getLabels().size(); j++) {
-				if (note.getLabels().get(j).getLabelId().equals(labelId)) {
-					note.getLabels().remove(i);
-					noteRepository.save(note);
-					noteElasticRepository.save(note);
-				}
-			}
-		}
-
-		labelRepository.deleteByLabelId(labelId);
-		labelElasticRepository.deleteByLabelId(labelId);
 	}
 
 	/**
@@ -382,77 +226,6 @@ public class NoteServiceImpl implements NoteService {
 			}
 		}
 	}
-
-	/**
-	 * 
-	 * @param userId
-	 * @param labelId
-	 * @param labelName
-	 * @throws LabelNotFoundException
-	 * @throws UnAuthorizedException
-	 */
-	@Override
-	public void editLabel(String userId, String labelId, String labelName)
-			throws LabelNotFoundException, UnAuthorizedException {
-
-		//Optional<Label> optionalLabel = labelRepository.findByLabelId(labelId);
-		
-		Optional<Label> optionalLabel =labelElasticRepository.findByLabelId(labelId);
-		
-		if (!optionalLabel.isPresent()) {
-			throw new LabelNotFoundException("label is not present in list");
-		}
-		
-		Label label=optionalLabel.get();
-
-		if (!label.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("the user with given id is not found");
-		}
-		
-		//List<Note> noteList = noteRepository.findAllByUserId(userId);
-		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
-		
-		for (int i = 0; i < noteList.size(); i++) {
-			Note note = noteList.get(i);
-			for (int j = 0; j < note.getLabels().size(); j++) {
-				if (note.getLabels().get(j).getLabelId().equals(labelId)) {
-					note.getLabels().get(i).setLabelName(labelName);
-					noteRepository.save(note);
-					noteElasticRepository.save(note);
-				}
-			}
-		}
-		label.setLabelName(labelName);
-		labelRepository.save(label);
-		labelElasticRepository.save(label);
-	}
-
-	/**
-	 * 
-	 * @param userId
-	 * @return LabelDTO
-	 * @throws NullValueException 
-	 */
-	@Override
-	public List<LabelDTO> viewUserLabels(String userId) throws NullValueException {
-
-	//List<Label> labels=labelRepository.findByUserId(userId);
-	List<Label> labels=labelElasticRepository.findByUserId(userId);
-	 if(labels.isEmpty()) {
-		throw new NullValueException("there is no any label for given user"); 
-	 }
-	 
-		List<LabelDTO> userLabels = new LinkedList<>();
-
-	 for(int i=0;i<labels.size();i++) {
-		 
-	 LabelDTO labelDto=modelMapper.map(labels.get(i),LabelDTO.class);
-	 
-	 userLabels.add(labelDto);
-	 }
-	 
-	 return userLabels;
-	}
 	
 	/**
 	 * 
@@ -466,8 +239,8 @@ public class NoteServiceImpl implements NoteService {
 	public void updateNote(String userId, UpdateDTO updateDto)
 			throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException {
 
-		//Optional<Note> checkNote = noteRepository.findById(updateDto.getNoteId());
-		Optional<Note> checkNote = noteElasticRepository.findById(updateDto.getNoteId());
+		Optional<Note> checkNote = noteRepository.findById(updateDto.getNoteId());
+	//Optional<Note> checkNote = noteElasticRepository.findById(updateDto.getNoteId());
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException("The note with given id does not exist");
 		}
@@ -479,7 +252,7 @@ public class NoteServiceImpl implements NoteService {
 		}
 
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException("Please enter valid token to match your 				account");
 		}
 
 		
@@ -502,26 +275,16 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws NullValueException
 	 */
 	@Override
-	public List<ViewNoteDTO> viewTrashed() throws NullValueException {
+	public List<ViewNoteDTO> viewTrashed(String userId) throws NullValueException {
 
 		//List<Note> noteList = noteRepository.findAll();
-		List<Note> noteList =(List<Note>) noteElasticRepository.findAll();
+		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
 
 		if (noteList == null) {
 			throw new NullValueException("There is no any details stored in note yet");
 		}
 
-		List<ViewNoteDTO> viewList = new LinkedList<>();
-
-		for (int index = 0; index < noteList.size(); index++) {
-
-			if (noteList.get(index).isTrashed()) {
-
-				ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
-				viewList.add(viewDto);
-			}
-		}
-		return viewList;
+		return noteList.stream().filter(noteStream-> noteStream.isTrashed()).map(filterNote-> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -566,22 +329,13 @@ public class NoteServiceImpl implements NoteService {
 		if (noteList.isEmpty()) {
 			throw new NullValueException("the note for given user is empty");
 		}
-
-		List<ViewNoteDTO> pinnedList = new LinkedList<>();
-		List<ViewNoteDTO> unpinnedList = new LinkedList<>();
-
-		for (int index = 0; index < noteList.size(); index++) {
-			if (!noteList.get(index).isTrashed()) {
-				ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
-				if (noteList.get(index).isPin()) {
-					pinnedList.add(viewDto);
-				} else {
-					unpinnedList.add(viewDto);
-				}
-			}
-		}
-		pinnedList.addAll(unpinnedList);
-		return pinnedList;
+		
+		List<ViewNoteDTO> pin=noteList.stream().filter(noteStream->!noteStream.isTrashed()&&noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+		List<ViewNoteDTO> unPin=noteList.stream().filter(noteStream->!noteStream.isTrashed() && !noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+	/*pin.addAll(unPin);
+		return pin;*/
+	return	Stream.concat(pin.stream(), unPin.stream())
+		   .collect(Collectors.toList());
 	}
 
 	/**
@@ -802,29 +556,16 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws NullValueException
 	 */
 	@Override
-	public List<ViewNoteDTO> viewArchieved() throws NullValueException {
+	public List<ViewNoteDTO> viewArchieved(String userId) throws NullValueException {
 		
 		//List<Note> noteList = noteRepository.findAll();
-		List<Note> noteList = (List<Note>) noteElasticRepository.findAll();
+		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
 
 		if (noteList == null) {
 			throw new NullValueException("There is no any details stored in note yet");
 		}
 
-		List<ViewNoteDTO> archieveList = new LinkedList<>();
-
-		for (int index = 0; index < noteList.size(); index++) {
-
-			if (!noteList.get(index).isTrashed()) {
-
-				if (noteList.get(index).isArchieve()) {
-
-					ViewNoteDTO viewDto = modelMapper.map(noteList.get(index), ViewNoteDTO.class);
-					archieveList.add(viewDto);
-				}
-			}
-		}
-		return archieveList;
+		return noteList.stream().filter(noteStream->!noteStream.isTrashed() &&noteStream.isArchieve()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -870,29 +611,16 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws NullValueException
 	 */
 	@Override
-	public List<ViewNoteDTO> viewPinned() throws NullValueException {
+	public List<ViewNoteDTO> viewPinned(String userId) throws NullValueException {
 
 		//List<Note> notes = noteRepository.findAll();
-		List<Note> notes = (List<Note>) noteElasticRepository.findAll();
+		List<Note> notes = noteElasticRepository.findAllByUserId(userId);
 
 		if (notes == null) {
 			throw new NullValueException("There is no any details stored in note yet");
 		}
 
-		List<ViewNoteDTO> pinnedList = new LinkedList<>();
-
-		for (int index = 0; index < notes.size(); index++) {
-
-			if (!notes.get(index).isTrashed()) {
-
-				if (notes.get(index).isPin()) {
-
-					ViewNoteDTO viewDto = modelMapper.map(notes.get(index), ViewNoteDTO.class);
-					pinnedList.add(viewDto);
-				}
-			}
-		}
-		return pinnedList;
+		return notes.stream().filter(noteStream->!noteStream.isTrashed()&&noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
