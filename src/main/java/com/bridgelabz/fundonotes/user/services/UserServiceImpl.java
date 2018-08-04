@@ -14,7 +14,6 @@ import com.bridgelabz.fundonotes.user.exception.ActivationException;
 import com.bridgelabz.fundonotes.user.exception.LoginException;
 import com.bridgelabz.fundonotes.user.exception.RegistrationException;
 import com.bridgelabz.fundonotes.user.exception.UserNotFoundException;
-import com.bridgelabz.fundonotes.user.mail.MailService;
 import com.bridgelabz.fundonotes.user.model.LoginDTO;
 import com.bridgelabz.fundonotes.user.model.MailDTO;
 import com.bridgelabz.fundonotes.user.model.PasswordDTO;
@@ -244,6 +243,7 @@ public class UserServiceImpl implements UserService {
 		user.get().setPassword(passwordEncoder.encode(dto.getPassword()));
 		userRepository.save(user.get());
 		userElasticRepository.save(user.get());
+		redisRepository.deleteFromRedis(uuid);
 
 	}
 }

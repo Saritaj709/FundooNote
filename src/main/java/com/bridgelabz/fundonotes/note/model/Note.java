@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.note.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -12,18 +13,19 @@ import org.springframework.data.elasticsearch.annotations.Document;
 public class Note {
 
 	@Id
- 	String noteId;
-	String title;
-	String description;
-	Date createdAt;
-	String userId;
-	Date lastModifiedAt;
-	String color="#fff";
-	Date reminder=null;
-	boolean isTrashed;
-	boolean archieve;
-	boolean pin;
-	List<Label> Labels;
+ 	private String noteId;
+	private String title;
+	private String description;
+	private Date createdAt;
+	private String userId;
+	private Date lastModifiedAt;
+	private String color="#fff";
+	private Date reminder=null;
+	private boolean trashed;
+	private boolean archieve;
+	private boolean pin;
+	private List<Label> Labels;
+	private List<UrlMetaData> metaData=new ArrayList<>(); 
 
 	public Note() {
 		super();
@@ -65,7 +67,7 @@ public class Note {
 		return userId;
 	}
 
-	public void setUserId(String userId) {
+	public void setUserId(String isTuserId) {
 		this.userId = userId;
 	}
 
@@ -93,12 +95,14 @@ public class Note {
 		this.reminder = reminder;
 	}
 
+	
+
 	public boolean isTrashed() {
-		return isTrashed;
+		return trashed;
 	}
 
-	public void setTrashed(boolean isTrashed) {
-		this.isTrashed = isTrashed;
+	public void setTrashed(boolean trashed) {
+		this.trashed = trashed;
 	}
 
 	public boolean isArchieve() {
@@ -125,12 +129,20 @@ public class Note {
 		Labels = labels;
 	}
 
+	public List<UrlMetaData> getMetaData() {
+		return metaData;
+	}
+
+	public void setMetaData(List<UrlMetaData> metaData) {
+		this.metaData = metaData;
+	}
+
 	@Override
 	public String toString() {
-		return "NoteDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
+		return "Note [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
 				+ createdAt + ", userId=" + userId + ", lastModifiedAt=" + lastModifiedAt + ", color=" + color
-				+ ", reminder=" + reminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
-				+ pin + ", Labels=" + Labels + "]";
+				+ ", reminder=" + reminder + ", trashed=" + trashed + ", archieve=" + archieve + ", pin=" + pin
+				+ ", Labels=" + Labels + ", metaData=" + metaData + "]";
 	}
 
 }

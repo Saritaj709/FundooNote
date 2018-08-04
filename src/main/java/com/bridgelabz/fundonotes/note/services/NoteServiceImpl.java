@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.note.services;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -7,6 +8,10 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -15,6 +20,7 @@ import org.springframework.stereotype.Service;
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
+import com.bridgelabz.fundonotes.note.exception.MalFormedException;
 import com.bridgelabz.fundonotes.note.exception.NoSuchLabelException;
 import com.bridgelabz.fundonotes.note.exception.NoteArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
@@ -30,6 +36,7 @@ import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.Note;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
+import com.bridgelabz.fundonotes.note.model.UrlMetaData;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.repository.ElasticRepositoryForLabel;
 import com.bridgelabz.fundonotes.note.repository.ElasticRepositoryForNote;
@@ -83,13 +90,14 @@ public class NoteServiceImpl implements NoteService {
 		}
 		
 		if (createDto.getReminder().before(new Date())) {
-			throw new DateException("reminder cannot be before current date");
+			throw new DateException("DateException");
 
 		}
-
+		
 		note.setUserId(userId);
 		note.setCreatedAt(new Date());
 		note.setLastModifiedAt(new Date());
+
 
 		for (int i = 0; i < createDto.getLabels().size(); i++) {
 
@@ -105,7 +113,7 @@ public class NoteServiceImpl implements NoteService {
 
 			}
 		}
-
+		
 		noteRepository.save(note);
         
 		noteElasticRepository.save(note);
@@ -115,6 +123,51 @@ public class NoteServiceImpl implements NoteService {
 		return viewNoteDto;
 
 	}
+	
+	/**
+	 * @param userId
+	 * @param metaData
+	 * @return 
+	 * @throws IOException 
+	 * @throws NoteNotFoundException 
+	 * @throws UnAuthorizedException 
+	 * @throws MalFormedException 
+	 */
+	@Override
+	public UrlMetaData addContent(String userId,String noteId, String url) throws NoteNotFoundException, UnAuthorizedException, MalFormedException {
+		
+		Optional<Note> optionalNote=noteElasticRepository.findByNoteId(noteId);
+		if(!optionalNote.isPresent()) {
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
+		}
+		
+		Note note=optionalNote.get();
+		if(!note.getUserId().equals(userId)) {
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
+		}
+        Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			throw new MalFormedException(environment.getProperty("MalFormedException"));
+		}  
+        String keywords = doc.select(environment.getProperty("KEYWORDS")).first().attr(environment.getProperty("CONTENT"));  
+        String description = doc.select(environment.getProperty("DESCRIPTION")).get(0).attr(environment.getProperty("CONTENT"));  
+        Elements images = doc.select(environment.getProperty("IMAGES")); 
+        UrlMetaData metaData=new UrlMetaData();
+    //  String img= doc.select("img").first().attr("src");
+        metaData.setUrl(url);
+        metaData.setKeywords(keywords);
+        metaData.setDescription(description);
+        //metaData.setImageUrl(img);
+      for(Element image:images) {
+    	//  metaData.setImageUrl(image.attr("src"));
+	  metaData.setImageUrl(image.absUrl("src"));
+     	}
+		return metaData;
+	}
+
 	
 	/**
 	 * 
@@ -197,7 +250,7 @@ public class NoteServiceImpl implements NoteService {
 		
 		Optional<Label> optionalLabel = labelElasticRepository.findByLabelId(labelId);
 		if (!optionalLabel.isPresent()) {
-			throw new LabelNotFoundException("the label with given id does not exist");
+			throw new LabelNotFoundException(environment.getProperty("LabelNotFoundException"));
 		}
         
 		Label label=optionalLabel.get();
@@ -205,13 +258,13 @@ public class NoteServiceImpl implements NoteService {
 		//Optional<Note> optionalNote = noteRepository.findByNoteId(noteId);
 		Optional<Note> optionalNote = noteElasticRepository.findByNoteId(noteId);
 		if (!optionalNote.isPresent()) {
-			throw new NoteNotFoundException("the note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 		
 		Note note = optionalNote.get();
 
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("this particular note is not authorized for given user");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 		
 		if(!label.getUserId().equals(userId)) {
@@ -242,17 +295,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteRepository.findById(updateDto.getNoteId());
 	//Optional<Note> checkNote = noteElasticRepository.findById(updateDto.getNoteId());
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("The note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 	
 		Note note=checkNote.get();
 		
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("this note no longer exists");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your 				account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 		
@@ -277,14 +330,13 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<ViewNoteDTO> viewTrashed(String userId) throws NullValueException {
 
-		//List<Note> noteList = noteRepository.findAll();
-		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId,true);
 
 		if (noteList == null) {
-			throw new NullValueException("There is no any details stored in note yet");
+			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
 
-		return noteList.stream().filter(noteStream-> noteStream.isTrashed()).map(filterNote-> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		return noteList.stream().map(filterNote-> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -296,10 +348,10 @@ public class NoteServiceImpl implements NoteService {
 	public List<ViewNoteDTO> readAllNotes() throws NullValueException {
 
 		//List<Note> noteList = noteRepository.findAll();
-		List<Note> noteList = (List<Note>) noteElasticRepository.findAll();
+		List<Note> noteList = noteRepository.findAll();
 
 		if (noteList == null) {
-			throw new NullValueException("There is no any details stored in note yet");
+			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
 
 		List<ViewNoteDTO> viewList = new LinkedList<>();
@@ -325,15 +377,13 @@ public class NoteServiceImpl implements NoteService {
 	public List<ViewNoteDTO> readUserNotes(String userId) throws NullValueException {
 
 		//List<Note> noteList = noteRepository.findAllByUserId(userId);
-		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId,false);
 		if (noteList.isEmpty()) {
-			throw new NullValueException("the note for given user is empty");
+			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
 		
-		List<ViewNoteDTO> pin=noteList.stream().filter(noteStream->!noteStream.isTrashed()&&noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
-		List<ViewNoteDTO> unPin=noteList.stream().filter(noteStream->!noteStream.isTrashed() && !noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
-	/*pin.addAll(unPin);
-		return pin;*/
+		List<ViewNoteDTO> pin=noteList.stream().filter(noteStream->noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+		List<ViewNoteDTO> unPin=noteList.stream().filter(noteStream->!noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
 	return	Stream.concat(pin.stream(), unPin.stream())
 		   .collect(Collectors.toList());
 	}
@@ -356,17 +406,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("the note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
 		Note note=checkNote.get();
 		
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("the note with given details are already trashed");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 		ViewNoteDTO viewDto = modelMapper.map(note, ViewNoteDTO.class);
@@ -383,17 +433,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findByNoteId(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("The given note does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
         
 		Note note=checkNote.get();
 		
 		if (!note.isTrashed()) {
-			throw new UntrashedException("Note is not trashed yet");
+			throw new UntrashedException(environment.getProperty("UntrashedException"));
 		}
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 		noteRepository.deleteByNoteId(noteId);
@@ -418,17 +468,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("the note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
          
 		Note note=checkNote.get();
 		
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("this note no longer exists");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 		note.setColor(color);
@@ -453,7 +503,7 @@ public class NoteServiceImpl implements NoteService {
 			throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException, DateException {
 
 		if (date.before(new Date())) {
-			throw new DateException("reminder cannot be before current date");
+			throw new DateException(environment.getProperty("DateException"));
 		}
 		
 	//	Optional<Note> checkNote = noteRepository.findById(noteId);
@@ -461,17 +511,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("the note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 		
 		Note note=checkNote.get();
 
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("this note no longer exists");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty(" UnAuthorizedException"));
 		}	
 		
 		note.setReminder(date);
@@ -498,13 +548,13 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("the note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 		
 		Note note=checkNote.get();
 
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 		note.setReminder(null);
@@ -531,17 +581,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 		
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("The note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
 		Note note=checkNote.get();
 		
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("the note with given details is trashed,pls restore first to archieve");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 			note.setArchieve(choice);
@@ -559,13 +609,13 @@ public class NoteServiceImpl implements NoteService {
 	public List<ViewNoteDTO> viewArchieved(String userId) throws NullValueException {
 		
 		//List<Note> noteList = noteRepository.findAll();
-		List<Note> noteList = noteElasticRepository.findAllByUserId(userId);
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId,false);
 
 		if (noteList == null) {
-			throw new NullValueException("There is no any details stored in note yet");
+			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
 
-		return noteList.stream().filter(noteStream->!noteStream.isTrashed() &&noteStream.isArchieve()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+		return noteList.stream().filter(noteStream->noteStream.isArchieve()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -586,17 +636,17 @@ public class NoteServiceImpl implements NoteService {
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("The note with given id does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 		
 		Note note=checkNote.get();
 
 		if (note.isTrashed()) {
-			throw new NoteTrashedException("the note with given details is already trashed,pls restore first to pin");
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
 			note.setPin(choice);
@@ -614,13 +664,14 @@ public class NoteServiceImpl implements NoteService {
 	public List<ViewNoteDTO> viewPinned(String userId) throws NullValueException {
 
 		//List<Note> notes = noteRepository.findAll();
-		List<Note> notes = noteElasticRepository.findAllByUserId(userId);
+		List<Note> notes = noteElasticRepository.findAllByUserIdAndTrashed(userId,false);
+		//List<Note> notes = noteElasticRepository.findAllByUserId(userId);
 
 		if (notes == null) {
-			throw new NullValueException("There is no any details stored in note yet");
+			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
-
-		return notes.stream().filter(noteStream->!noteStream.isTrashed()&&noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+       
+		return notes.stream().filter(noteStream->noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -637,17 +688,17 @@ public class NoteServiceImpl implements NoteService {
 	public void deleteOrRestoreNote(String userId, String noteId, boolean choice)
 			throws NoteNotFoundException, UnAuthorizedException, UntrashedException, NoteTrashedException {
 
-		//Optional<Note> checkNote = noteRepository.findByNoteId(noteId);
-		Optional<Note> checkNote = noteElasticRepository.findByNoteId(noteId);
+		Optional<Note> checkNote = noteRepository.findByNoteId(noteId);
+		//Optional<Note> checkNote = noteElasticRepository.findByNoteId(noteId);
 
 		if (!checkNote.isPresent()) {
-			throw new NoteNotFoundException("The given note does not exist");
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
 		Note note=checkNote.get();
 		
 		if (!note.getUserId().equals(userId)) {
-			throw new UnAuthorizedException("Please enter valid token to match your account");
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 		
 			note.setTrashed(choice);
@@ -655,5 +706,4 @@ public class NoteServiceImpl implements NoteService {
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
 	}
-
 }

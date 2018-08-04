@@ -1,11 +1,13 @@
 package com.bridgelabz.fundonotes.note.services;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
+import com.bridgelabz.fundonotes.note.exception.MalFormedException;
 import com.bridgelabz.fundonotes.note.exception.NoteArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
@@ -18,6 +20,7 @@ import com.bridgelabz.fundonotes.note.exception.UntrashedException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
+import com.bridgelabz.fundonotes.note.model.UrlMetaData;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
 public interface NoteService {
@@ -147,17 +150,6 @@ public interface NoteService {
 	/**
 	 * 
 	 * @param token
-	 * @param labelName
-	 * @return Label
-	 * @throws UnAuthorizedException
-	 * @throws NullValueException
-	 * @throws NoteNotFoundException
-	 *//*
-	LabelDTO createLabel(String token, String labelName) throws UnAuthorizedException, NullValueException, NoteNotFoundException;
-
-	*//**
-	 * 
-	 * @param token
 	 * @param labelId
 	 * @param noteId
 	 * @throws NoteNotFoundException
@@ -168,13 +160,6 @@ public interface NoteService {
 	void addLabel(String token, String labelId, String noteId) throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException, LabelAdditionException;
 
 	/**
-	 * 
-	 * @return List of Labels
-	 * @throws NullValueException
-	 *//*
-	List<Label> viewLabels() throws NullValueException;
-
-	*//**
 	 * 
 	 * @param token
 	 * @param noteId
@@ -187,37 +172,6 @@ public interface NoteService {
 	void deleteOrRestoreNote(String token, String noteId, boolean choice) throws NoteNotFoundException, UnAuthorizedException, UntrashedException, NoteTrashedException;
 
 	/**
-	 * 
-	 * @param userId
-	 * @param labelName
-	 * @throws NoteNotFoundException
-	 * @throws LabelNotFoundException
-	 * @throws UnAuthorizedException
-	 *//*
-	void removeLabel(String userId, String labelName) throws NoteNotFoundException, LabelNotFoundException, UnAuthorizedException;
-
-	*//**
-	 * 
-	 * @param userId
-	 * @param labelId
-	 * @param labelName
-	 * @throws LabelNotFoundException
-	 * @throws UnAuthorizedException
-	 *//*
-	void editLabel(String userId, String labelId, String labelName) throws LabelNotFoundException, UnAuthorizedException;
-
-	*//**
-	 * 
-	 * @param userId
-	 * @param labelId
-	 * @return List of ViewNoteDTO
-	 * @throws LabelNotFoundException
-	 * @throws UnAuthorizedException
-	 * @throws NoteNotFoundException
-	 *//*
-	List<ViewNoteDTO> viewLabel(String userId,String labelId) throws LabelNotFoundException, UnAuthorizedException, NoteNotFoundException;
-    
-	*//**
 	 * 
 	 * @param userId
 	 * @param noteId
@@ -246,13 +200,15 @@ public interface NoteService {
 	 * @throws NoteTrashedException
 	 */
 	void addColor(String userId, String color, String noteId) throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException;
-
+   	
 	/**
-	 * 
 	 * @param userId
-	 * @return LabelDTO
-	 * @throws NullValueException 
-	 *//*
-	List<LabelDTO> viewUserLabels(String userId) throws NullValueException;*/
-
+	 * @param metaData
+	 * @return UrlMetaData
+	 * @throws IOException 
+	 * @throws NoteNotFoundException 
+	 * @throws UnAuthorizedException 
+	 * @throws MalFormedException 
+	 */
+	UrlMetaData addContent(String userId,String noteId,String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException;
 }

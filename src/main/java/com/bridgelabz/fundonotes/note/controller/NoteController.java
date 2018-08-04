@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.note.controller;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -23,6 +24,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
+import com.bridgelabz.fundonotes.note.exception.MalFormedException;
 import com.bridgelabz.fundonotes.note.exception.NoteArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
@@ -36,8 +38,14 @@ import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
+import com.bridgelabz.fundonotes.note.model.UrlMetaData;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.services.NoteService;
+
+/**
+ * @author Sarita
+ *
+ */
 
 @RestController
 @RequestMapping("/api/notes")
@@ -69,6 +77,23 @@ public class NoteController {
 		ViewNoteDTO viewNoteDto = noteService.createNote(userId, createDto);
 
 		return new ResponseEntity<>(viewNoteDto, HttpStatus.CREATED);
+	}
+	
+	
+	/**
+	 * @param req
+	 * @param noteId
+	 * @param url
+	 * @return UrlMetaData
+	 * @throws NoteNotFoundException
+	 * @throws UnAuthorizedException
+	 * @throws MalFormedException
+	 */
+	@PostMapping(value="/scrap")
+	public ResponseEntity<UrlMetaData> createContent(HttpServletRequest req,@RequestParam(value="noteId")String noteId,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException{
+		String userId=(String) req.getAttribute("userId");
+		UrlMetaData urlMetaData=noteService.addContent(userId,noteId, url);
+		return new ResponseEntity<>(urlMetaData,HttpStatus.CREATED);
 	}
 
 	// ---------------Add Label To Notes-----------------------

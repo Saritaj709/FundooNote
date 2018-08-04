@@ -155,10 +155,18 @@ public class GlobalExceptionHandlerForNote {
 		logger.error("note unarchieved error");
 		Response response = new Response();
 		response.setMessage("note unarchieved exception, " + e.getMessage());
-		response.setStatus(119);
+		response.setStatus(120);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(MalFormedException.class)
+	public ResponseEntity<Response> malformedExceptionHandler(MalFormedException e) {
+		logger.error("malformed error jsoup");
+		Response response = new Response();
+		response.setMessage("malformed exception jsoup, " + e.getMessage());
+		response.setStatus(121);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
 	
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {

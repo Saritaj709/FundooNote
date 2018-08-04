@@ -1,7 +1,5 @@
 package com.bridgelabz.fundonotes.user.repository;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.redis.core.HashOperations;
@@ -20,11 +18,10 @@ public class RedisRepositoryImpl implements RedisRepository{
 	@Autowired
 	RedisRepositoryImpl(RedisTemplate<String,String> redisTemplate){
 		this.redisTemplate=redisTemplate;
+		hashOperations=this.redisTemplate.opsForHash();
+
 	}
-	@PostConstruct
-	private void init() {
-		hashOperations=redisTemplate.opsForHash();
-	}
+
 	@Override
 	public void saveInRedis(String randomString,String userId) {
      
@@ -38,8 +35,8 @@ public class RedisRepositoryImpl implements RedisRepository{
 	}
 
 	@Override
-	public void deleteFromRedis(String userId) {
-		hashOperations.delete(KEY, userId);
+	public void deleteFromRedis(String uuid) {
+		hashOperations.delete(KEY, uuid);
 	}
 
 }

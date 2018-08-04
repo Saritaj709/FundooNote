@@ -5,14 +5,19 @@ import java.util.List;
 
 public class CreateDTO {
 
-	String title;
-	String description;
+	private String title;
+	private String description;
 
-	List<Label> labels;
-	String color;
-	Date reminder;
-	boolean archieve;
-	boolean pin;
+	private List<Label> labels;
+	private String color;
+	private Date reminder;
+	private boolean archieve;
+	private boolean pin;
+	private List<UrlMetaData> metaData; 
+
+	public CreateDTO() {
+		
+	}
 	
 	public String getTitle() {
 		return title;
@@ -69,6 +74,14 @@ public class CreateDTO {
 
 	public void setPin(boolean pin) {
 		this.pin = pin;
+	}
+
+	public List<UrlMetaData> getMetaData() {
+		return metaData;
+	}
+
+	public void setMetaData(List<UrlMetaData> metaData) {
+		this.metaData = metaData;
 	}
 
 	@Override

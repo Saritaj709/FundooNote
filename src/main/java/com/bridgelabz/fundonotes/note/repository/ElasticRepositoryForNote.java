@@ -15,4 +15,6 @@ public interface ElasticRepositoryForNote extends ElasticsearchRepository<Note,S
 
 	void deleteByNoteId(String noteId);
 
+	List<Note> findAllByUserIdAndTrashed(String userId, boolean b);
+
 }
