@@ -13,7 +13,7 @@ public class CreateDTO {
 	private Date reminder;
 	private boolean archieve;
 	private boolean pin;
-	private List<UrlMetaData> metaData; 
+	private String url;
 
 	public CreateDTO() {
 		
@@ -76,12 +76,12 @@ public class CreateDTO {
 		this.pin = pin;
 	}
 
-	public List<UrlMetaData> getMetaData() {
-		return metaData;
+	public String getUrl() {
+		return url;
 	}
 
-	public void setMetaData(List<UrlMetaData> metaData) {
-		this.metaData = metaData;
+	public void setUrl(String url) {
+		this.url = url;
 	}
 
 	@Override

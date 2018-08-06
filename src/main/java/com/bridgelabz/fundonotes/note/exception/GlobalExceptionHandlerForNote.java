@@ -168,6 +168,17 @@ public class GlobalExceptionHandlerForNote {
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(UrlAdditionException.class)
+	public ResponseEntity<Response> urlAdditionExceptionHandler(UrlAdditionException
+			 e) {
+		logger.error("malformed error jsoup");
+		Response response = new Response();
+		response.setMessage("malformed exception jsoup, " + e.getMessage());
+		response.setStatus(122);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
+	
+	
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {
 		logger.error("other exceptions");

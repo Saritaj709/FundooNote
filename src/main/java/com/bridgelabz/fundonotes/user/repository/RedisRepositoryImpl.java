@@ -23,19 +23,19 @@ public class RedisRepositoryImpl implements RedisRepository{
 	}
 
 	@Override
-	public void saveInRedis(String randomString,String userId) {
+	public void save(String randomString,String email) {
      
-		hashOperations.put(KEY,randomString, userId);
+		hashOperations.put(KEY,randomString, email);
 		
 	}
 
 	@Override
-	public String getFromRedis(String uuid) {
+	public String get(String uuid) {
 		return hashOperations.get(KEY, uuid);
 	}
 
 	@Override
-	public void deleteFromRedis(String uuid) {
+	public void delete(String uuid) {
 		hashOperations.delete(KEY, uuid);
 	}
 

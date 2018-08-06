@@ -13,9 +13,10 @@ public class ViewNoteDTO {
 	List<Label> labels;
 	String color;
 	Date reminder;
-	boolean isTrashed;
+	boolean trashed;
 	boolean archieve;
 	boolean pin;
+	List<UrlMetaData> metaData;
 
 	public ViewNoteDTO() {
 		super();
@@ -78,11 +79,11 @@ public class ViewNoteDTO {
 	}
 
 	public boolean isTrashed() {
-		return isTrashed;
+		return trashed;
 	}
 
 	public void setTrashed(boolean isTrashed) {
-		this.isTrashed = isTrashed;
+		this.trashed = isTrashed;
 	}
 
 	public boolean isArchieve() {
@@ -110,12 +111,20 @@ public class ViewNoteDTO {
 		this.noteId = noteId;
 	}
 
+	public List<UrlMetaData> getMetaData() {
+		return metaData;
+	}
+
+	public void setMetaData(List<UrlMetaData> metaData) {
+		this.metaData = metaData;
+	}
+
 	@Override
 	public String toString() {
-		return "ViewDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
+		return "ViewNoteDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
 				+ createdAt + ", lastModifiedAt=" + lastModifiedAt + ", labels=" + labels + ", color=" + color
-				+ ", reminder=" + reminder + ", isTrashed=" + isTrashed + ", archieve=" + archieve + ", pin="
-				+ pin + "]";
+				+ ", reminder=" + reminder + ", trashed=" + trashed + ", archieve=" + archieve + ", pin=" + pin
+				+ ", urlMetaData=" + metaData + "]";
 	}
 
 }

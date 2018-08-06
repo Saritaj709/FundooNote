@@ -125,7 +125,7 @@ public class UserServiceImpl implements UserService {
 			throw new LoginException("Password unmatched");
 		}
 
-		String jwt = jwtToken.tokenGenerator(loginDto.getId());
+		String jwt = jwtToken.tokenGenerator(checkUser.get().getEmail());
 		return jwt;
 
 	}
@@ -203,10 +203,10 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public void forgetPassword(String id) throws UserNotFoundException {
+	public void forgetPassword(String email) throws UserNotFoundException {
 
 	//	Optional<User> user = userRepository.findById(id);
-		Optional<User> user = userElasticRepository.findById(id);
+		Optional<User> user = userElasticRepository.findByEmail(email);
 
 
 		if (!user.isPresent()) {
@@ -214,10 +214,10 @@ public class UserServiceImpl implements UserService {
 		}
 
 		String uuid=UserUtility.generateUUId();
-		redisRepository.saveInRedis(uuid,id);
+		redisRepository.save(uuid,email);
 
 		MailDTO mail = new MailDTO();
-		mail.setTo(user.get().getEmail());
+		mail.setTo(email);
 		mail.setSubject("Password reset mail");
 		mail.setText(environment.getProperty("passwordResetLink")  + uuid);
 
@@ -230,11 +230,10 @@ public class UserServiceImpl implements UserService {
 		
 		UserUtility.validateReset(dto);
 		
-		String userId= redisRepository.getFromRedis(uuid);
+		String email= redisRepository.get(uuid);
 
 		//Optional<User> user = userRepository.findById(userId);
-		Optional<User> user = userElasticRepository.findById(userId);
-
+		Optional<User> user = userElasticRepository.findByEmail(email);
 
 		if (!user.isPresent()) {
 			throw new UserNotFoundException("User not found");
@@ -243,7 +242,7 @@ public class UserServiceImpl implements UserService {
 		user.get().setPassword(passwordEncoder.encode(dto.getPassword()));
 		userRepository.save(user.get());
 		userElasticRepository.save(user.get());
-		redisRepository.deleteFromRedis(uuid);
+		redisRepository.delete(uuid);
 
 	}
 }

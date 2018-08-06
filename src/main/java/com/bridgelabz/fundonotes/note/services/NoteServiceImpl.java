@@ -1,6 +1,7 @@
 package com.bridgelabz.fundonotes.note.services;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -8,6 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.apache.commons.validator.routines.UrlValidator;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -31,6 +33,7 @@ import com.bridgelabz.fundonotes.note.exception.NoteUnArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteUnPinnedException;
 import com.bridgelabz.fundonotes.note.exception.NullValueException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
+import com.bridgelabz.fundonotes.note.exception.UrlAdditionException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.Label;
@@ -75,10 +78,11 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws DateException
 	 * @throws LabelNotFoundException
 	 * @throws NullValueException
+	 * @throws MalFormedException 
 	 */
 	@Override
 	public ViewNoteDTO createNote(String userId, CreateDTO createDto) throws NoteNotFoundException, NoteCreationException,
-			UnAuthorizedException, DateException, LabelNotFoundException, NullValueException {
+			UnAuthorizedException, DateException, LabelNotFoundException, NullValueException, MalFormedException {
 
 		NoteUtility.validateNoteCreation(createDto);
 
@@ -90,14 +94,13 @@ public class NoteServiceImpl implements NoteService {
 		}
 		
 		if (createDto.getReminder().before(new Date())) {
-			throw new DateException("DateException");
+			throw new DateException(environment.getProperty("DateException"));
 
 		}
 		
 		note.setUserId(userId);
 		note.setCreatedAt(new Date());
 		note.setLastModifiedAt(new Date());
-
 
 		for (int i = 0; i < createDto.getLabels().size(); i++) {
 
@@ -114,9 +117,18 @@ public class NoteServiceImpl implements NoteService {
 			}
 		}
 		
+		UrlValidator validateUrl=new UrlValidator();
+		if(createDto.getUrl()!=null) {
+			if(validateUrl.isValid(createDto.getUrl()));
+		
+		List<UrlMetaData> metaData=addContent(createDto.getUrl());
+		note.setMetaData(metaData);
+		}
+		
 		noteRepository.save(note);
         
 		noteElasticRepository.save(note);
+		System.out.println(note);
 		
 		ViewNoteDTO viewNoteDto=modelMapper.map(note,ViewNoteDTO.class);
 		
@@ -134,7 +146,74 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws MalFormedException 
 	 */
 	@Override
-	public UrlMetaData addContent(String userId,String noteId, String url) throws NoteNotFoundException, UnAuthorizedException, MalFormedException {
+	public  List<UrlMetaData> addContent(String url)
+			throws NoteNotFoundException, UnAuthorizedException, MalFormedException {
+
+		List<UrlMetaData> urlList = new ArrayList<>();
+
+		Document doc;
+		try {
+			doc = Jsoup.connect(url).get();
+		} catch (IOException e) {
+			throw new MalFormedException(environment.getProperty("MalFormedException"));
+		}
+
+		String keywords = doc.select(environment.getProperty("KEYWORDS")).first()
+				.attr(environment.getProperty("CONTENT"));
+		String description = doc.select(environment.getProperty("DESCRIPTION")).get(0)
+				.attr(environment.getProperty("CONTENT"));
+		Elements images = doc.select(environment.getProperty("IMAGES"));
+		UrlMetaData metaData = new UrlMetaData();
+		// String img= doc.select("img").first().attr("src");
+		metaData.setUrl(url);
+		metaData.setKeywords(keywords);
+		metaData.setDescription(description);
+		// metaData.setImageUrl(img);
+		for (Element image : images) {
+			// metaData.setImageUrl(image.attr("src"));
+			metaData.setImageUrl(image.absUrl("src"));
+		}
+		urlList.add(metaData);
+		return urlList;
+	}
+
+	/*public List<UrlMetaData> addContent(List<String> url) throws NoteNotFoundException, UnAuthorizedException, MalFormedException {
+		
+		List<UrlMetaData> urlList=new ArrayList<>();
+		urlList.addAll(addContent(url));
+		
+		UrlValidator validateUrl=new UrlValidator();
+		url.stream().filter(urlStream->validateUrl.isValid(urlStream)).forEach(filterStream->{ 
+			try {
+				addContent(filterStream);
+			} catch (NoteNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (UnAuthorizedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (MalFormedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+		});
+		  
+       return urlList;
+	}*/
+	
+	
+	/**
+	 * @param userId
+	 * @param noteId
+	 * @param url
+	 * @throws MalFormedException 
+	 * @throws NoteNotFoundException 
+	 * @throws UnAuthorizedException 
+	 * @throws UrlAdditionException 
+	 */
+	@Override
+	public void addContentToNote(String userId, String noteId, String url) throws MalFormedException, NoteNotFoundException, UnAuthorizedException, UrlAdditionException {
 		
 		Optional<Note> optionalNote=noteElasticRepository.findByNoteId(noteId);
 		if(!optionalNote.isPresent()) {
@@ -145,29 +224,32 @@ public class NoteServiceImpl implements NoteService {
 		if(!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
-        Document doc;
-		try {
-			doc = Jsoup.connect(url).get();
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			throw new MalFormedException(environment.getProperty("MalFormedException"));
-		}  
-        String keywords = doc.select(environment.getProperty("KEYWORDS")).first().attr(environment.getProperty("CONTENT"));  
-        String description = doc.select(environment.getProperty("DESCRIPTION")).get(0).attr(environment.getProperty("CONTENT"));  
-        Elements images = doc.select(environment.getProperty("IMAGES")); 
-        UrlMetaData metaData=new UrlMetaData();
-    //  String img= doc.select("img").first().attr("src");
-        metaData.setUrl(url);
-        metaData.setKeywords(keywords);
-        metaData.setDescription(description);
-        //metaData.setImageUrl(img);
-      for(Element image:images) {
-    	//  metaData.setImageUrl(image.attr("src"));
-	  metaData.setImageUrl(image.absUrl("src"));
-     	}
-		return metaData;
-	}
+		
+        List<UrlMetaData> listMetaData=new ArrayList<>();
 
+		listMetaData = note.getMetaData();
+
+		if (listMetaData!= null) {
+
+			for (int i = 0; i < listMetaData.size(); i++) {
+
+				if (listMetaData.get(i).getUrl().equals(url)) {
+					throw new UrlAdditionException(environment.getProperty("UrlAdditionException"));
+				}
+			}
+			
+			List<UrlMetaData> data=addContent(url);
+			
+			listMetaData.addAll(data);
+
+			note.setMetaData(listMetaData);
+		}
+		else {
+			note.setMetaData(listMetaData);
+		}
+		noteRepository.save(note);
+		noteElasticRepository.save(note);
+	}
 	
 	/**
 	 * 
@@ -293,7 +375,7 @@ public class NoteServiceImpl implements NoteService {
 			throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException {
 
 		Optional<Note> checkNote = noteRepository.findById(updateDto.getNoteId());
-	//Optional<Note> checkNote = noteElasticRepository.findById(updateDto.getNoteId());
+
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
@@ -706,4 +788,5 @@ public class NoteServiceImpl implements NoteService {
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
 	}
+
 }

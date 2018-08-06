@@ -17,6 +17,7 @@ import com.bridgelabz.fundonotes.note.exception.NoteUnArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteUnPinnedException;
 import com.bridgelabz.fundonotes.note.exception.NullValueException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
+import com.bridgelabz.fundonotes.note.exception.UrlAdditionException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
@@ -36,8 +37,9 @@ public interface NoteService {
 	 * @throws DateException
 	 * @throws LabelNotFoundException
 	 * @throws NullValueException
+	 * @throws MalFormedException 
 	 */
-	ViewNoteDTO createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException, LabelNotFoundException, NullValueException;
+	ViewNoteDTO createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException, LabelNotFoundException, NullValueException, MalFormedException;
 
 	/**
 	 * 
@@ -210,5 +212,16 @@ public interface NoteService {
 	 * @throws UnAuthorizedException 
 	 * @throws MalFormedException 
 	 */
-	UrlMetaData addContent(String userId,String noteId,String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException;
+	List<UrlMetaData> addContent(String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException;
+
+	/**
+	 * @param userId
+	 * @param noteId
+	 * @param url
+	 * @throws MalFormedException 
+	 * @throws NoteNotFoundException 
+	 * @throws UnAuthorizedException 
+	 * @throws UrlAdditionException 
+	 */
+	void addContentToNote(String userId,String noteId,String url) throws MalFormedException, NoteNotFoundException, UnAuthorizedException, UrlAdditionException;
 }

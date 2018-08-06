@@ -2,9 +2,9 @@ package com.bridgelabz.fundonotes.user.repository;
 
 public interface RedisRepository {
 
-	public void saveInRedis(String UUID,String userId);
+	public void save(String UUID,String email);
 
-	public String getFromRedis(String UUID);
+	public String get(String UUID);
 
-	public void deleteFromRedis(String userId);
+	public void delete(String uuid);
 }

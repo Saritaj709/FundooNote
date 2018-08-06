@@ -1,6 +1,5 @@
 package com.bridgelabz.fundonotes.note.model;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -25,7 +24,7 @@ public class Note {
 	private boolean archieve;
 	private boolean pin;
 	private List<Label> Labels;
-	private List<UrlMetaData> metaData=new ArrayList<>(); 
+	private List<UrlMetaData> metaData; 
 
 	public Note() {
 		super();
@@ -67,7 +66,7 @@ public class Note {
 		return userId;
 	}
 
-	public void setUserId(String isTuserId) {
+	public void setUserId(String userId) {
 		this.userId = userId;
 	}
 

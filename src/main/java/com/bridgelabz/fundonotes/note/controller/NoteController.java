@@ -34,6 +34,7 @@ import com.bridgelabz.fundonotes.note.exception.NoteUnArchievedException;
 import com.bridgelabz.fundonotes.note.exception.NoteUnPinnedException;
 import com.bridgelabz.fundonotes.note.exception.NullValueException;
 import com.bridgelabz.fundonotes.note.exception.UntrashedException;
+import com.bridgelabz.fundonotes.note.exception.UrlAdditionException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.Response;
@@ -66,11 +67,12 @@ public class NoteController {
 	 * @throws DateException
 	 * @throws LabelNotFoundException
 	 * @throws NullValueException
+	 * @throws MalFormedException 
 	 */
 	@PostMapping(value = "/create")
 	public ResponseEntity<ViewNoteDTO> createNote(HttpServletRequest req, @RequestBody CreateDTO createDto)
 			throws NoteCreationException, NoteNotFoundException, UnAuthorizedException, DateException,
-			LabelNotFoundException, NullValueException {
+			LabelNotFoundException, NullValueException, MalFormedException {
 
 		String userId = (String) req.getAttribute("userId");
 
@@ -90,10 +92,24 @@ public class NoteController {
 	 * @throws MalFormedException
 	 */
 	@PostMapping(value="/scrap")
-	public ResponseEntity<UrlMetaData> createContent(HttpServletRequest req,@RequestParam(value="noteId")String noteId,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException{
+	public ResponseEntity<List<UrlMetaData>> createContent(HttpServletRequest req,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException{
 		String userId=(String) req.getAttribute("userId");
-		UrlMetaData urlMetaData=noteService.addContent(userId,noteId, url);
+		List<UrlMetaData> urlMetaData=noteService.addContent(url);
 		return new ResponseEntity<>(urlMetaData,HttpStatus.CREATED);
+	}
+
+	//--------------------Add Content To Particular Note------------
+	@PostMapping(value="/addscrap-to-note")
+	public ResponseEntity<Response> addContentTo(HttpServletRequest req,@RequestParam(value="noteId")String noteId,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException, UrlAdditionException{
+		
+		String userId=(String) req.getAttribute("userId");
+		noteService.addContentToNote(userId,noteId,url);
+	
+		Response response = new Response();
+
+		response.setMessage("Content succesfully added to note");
+		response.setStatus(31);
+		return new ResponseEntity<>(response,HttpStatus.CREATED);
 	}
 
 	// ---------------Add Label To Notes-----------------------
