@@ -33,8 +33,8 @@ public class SwaggerConfig {
 
 	private ApiInfo apiInfo() {
 		return new ApiInfoBuilder().title("JavaInUse API").description("JavaInUse API reference for developers")
-				.termsOfServiceUrl("http://javainuse.com").contact("javainuse@gmail.com").license("JavaInUse License")
-				.licenseUrl("javainuse@gmail.com").version("1.0").build();
+				.termsOfServiceUrl("http://javainuse.com").contact("saritaj709@gmail.com").license("Sarita Jaiswal")
+				.licenseUrl("saritaj709@gmail.com").version("1.0").build();
 	}
 	
 	@Bean

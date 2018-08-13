@@ -14,7 +14,7 @@ public class Note {
 	@Id
  	private String noteId;
 	private String title;
-	private String description;
+	private List<String> description;
 	private Date createdAt;
 	private String userId;
 	private Date lastModifiedAt;
@@ -46,11 +46,11 @@ public class Note {
 		this.title = title;
 	}
 
-	public String getDescription() {
+	public List<String> getDescription() {
 		return description;
 	}
 
-	public void setDescription(String description) {
+	public void setDescription(List<String> description) {
 		this.description = description;
 	}
 

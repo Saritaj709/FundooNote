@@ -138,10 +138,10 @@ public class UserController {
 	//-----------------------Forgot password------------------------
 	
 	@RequestMapping(value = "/forgotpassword", method = RequestMethod.POST)
-	public ResponseEntity<ResponseDTO> forgetPassword(@RequestParam(value="id") String id) throws UserNotFoundException {
+	public ResponseEntity<ResponseDTO> forgetPassword(@RequestParam(value="email") String email) throws UserNotFoundException {
 
-	    userService.forgetPassword(id);
-	    System.out.println(id);
+	    userService.forgetPassword(email);
+	    System.out.println(email);
 		ResponseDTO response = new ResponseDTO();
 		response.setMessage("link sent to email,pls check and verify");
 		response.setStatus(1);

@@ -1,7 +1,9 @@
-package com.bridgelabz.fundonotes.note.services;
+package com.bridgelabz.fundonotes.user.services;
 
-	import org.springframework.beans.factory.annotation.Value;
-	import org.springframework.social.facebook.api.Facebook;
+	import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.env.Environment;
+import org.springframework.social.facebook.api.Facebook;
 	import org.springframework.social.facebook.api.impl.FacebookTemplate;
 	import org.springframework.social.facebook.connect.FacebookConnectionFactory;
 	import org.springframework.social.oauth2.AccessGrant;
@@ -18,19 +20,22 @@ package com.bridgelabz.fundonotes.note.services;
 		String facebookSecret;
 		
 		String accessToken;
+		
+		@Autowired
+		private Environment environment;
 
 		public String createFacebookAuthorizationURL() {
 			FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
 			OAuth2Operations oauthOperations = connectionFactory.getOAuthOperations();
 			OAuth2Parameters params = new OAuth2Parameters();
-			params.setRedirectUri("http://localhost:8081/swagger-ui.html#!/facebook-login-controller/createFacebookAuthorizationUsingGET");
+			params.setRedirectUri(environment.getProperty("RedirectUri"));
 			params.setScope("public_profile,email,user_birthday");
 			return oauthOperations.buildAuthorizeUrl(params);
 		}
 		
 		public void createFacebookAccessToken(String code) {
 		    FacebookConnectionFactory connectionFactory = new FacebookConnectionFactory(facebookAppId, facebookSecret);
-		    AccessGrant accessGrant = connectionFactory.getOAuthOperations().exchangeForAccess(code, "http://localhost:8081/swagger-ui.html#!/facebook-login-controller/createFacebookAuthorizationUsingGET", null);
+		    AccessGrant accessGrant = connectionFactory.getOAuthOperations().exchangeForAccess(code,environment.getProperty("RedirectUri"), null);
 		    accessToken = accessGrant.getAccessToken();
 		}
 
