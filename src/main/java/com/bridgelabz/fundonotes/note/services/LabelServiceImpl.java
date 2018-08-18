@@ -1,5 +1,7 @@
 package com.bridgelabz.fundonotes.note.services;
 
+import java.util.Comparator;
+import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
@@ -73,6 +75,7 @@ public class LabelServiceImpl implements LabelService{
 		Label label = new Label();
 		label.setLabelName(labelName);
 		label.setUserId(userId);
+		label.setLabelCreatedAt(new Date());
 
 		labelRepository.save(label);
 		
@@ -345,5 +348,68 @@ public class LabelServiceImpl implements LabelService{
 				noteElasticRepository.save(note);
 			}
 		}
+	}
+	
+	/**
+	 * @param userId
+	 * @param order
+	 * @return LabelDTO sorted by name
+	 * @throws NullValueException
+	 */
+	@Override
+	public List<LabelDTO> sortLabelsByDateOrName(String userId, String order,String choice) throws NullValueException {
+
+		List<Label> labels = labelElasticRepository.findByUserId(userId);
+		if (labels.isEmpty()) {
+			throw new NullValueException(environment.getProperty("NullValueException"));
+		}
+
+		if(choice.equals("date")) {
+			
+			if (order.equalsIgnoreCase("asc")) {
+				return labels.stream().sorted(Comparator.comparing(Label::getLabelCreatedAt))
+						.map(SortedLabel -> modelMapper.map(SortedLabel, LabelDTO.class)).collect(Collectors.toList());
+			}
+
+	           return labels.stream().sorted(Comparator.comparing(Label::getLabelCreatedAt).reversed())
+						.map(SortedLabel -> modelMapper.map(SortedLabel, LabelDTO.class)).collect(Collectors.toList());
+			
+		}
+		if(choice.equals("name")) {
+
+		if (order.equals("desc")) {
+
+			return labels.stream().sorted(Comparator.comparing(Label::getLabelName).reversed())
+					.map(SortedLabel -> modelMapper.map(SortedLabel, LabelDTO.class)).collect(Collectors.toList());
+			}
+		return labels.stream().sorted(Comparator.comparing(Label::getLabelName))
+				.map(SortedLabel -> modelMapper.map(SortedLabel, LabelDTO.class)).collect(Collectors.toList());
+		}
+		return null;
+	}
+
+	/**
+	 * @param userId
+	 * @param order
+	 * @throws NullValueException 
+	 */
+	@Override
+	public List<LabelDTO> sortLabelsByDate(String userId, String order) throws NullValueException {
+		List<Label> labels = labelElasticRepository.findByUserId(userId);
+		if (labels.isEmpty()) {
+			throw new NullValueException(environment.getProperty("NullValueException"));
+		}
+		
+		if (order.equalsIgnoreCase("asc")) {
+			return labels.stream().sorted(Comparator.comparing(Label::getLabelCreatedAt))
+					.map(SortedLabel -> modelMapper.map(SortedLabel, LabelDTO.class)).collect(Collectors.toList());
+		}
+
+		if (order.equalsIgnoreCase("desc")) {
+           System.out.println("hi2");
+           return labels.stream().sorted(Comparator.comparing(Label::getLabelCreatedAt).reversed())
+					.map(SortedLabel -> modelMapper.map(SortedLabel, LabelDTO.class)).collect(Collectors.toList());
+		}
+		return null;
 	}
 }

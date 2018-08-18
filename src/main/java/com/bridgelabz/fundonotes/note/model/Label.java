@@ -1,20 +1,21 @@
 package com.bridgelabz.fundonotes.note.model;
 
+import java.util.Date;
+
 import org.springframework.data.annotation.Id;
 import org.springframework.data.elasticsearch.annotations.Document;
-//import org.springframework.data.mongodb.core.mapping.Document;
-//import org.springframework.stereotype.Service;
 
 /*@Document(collection="labels")
 @Service*/
-@Document(indexName="labeldb",type="label")
+@Document(indexName = "labeldbs", type = "label")
 public class Label {
-	
+
 	@Id
-    String labelId;
-    String labelName;
-    String userId;
-	
+	private String labelId;
+	private String labelName;
+	private String userId;
+	private Date labelCreatedAt;
+
 	public Label() {
 		super();
 	}
@@ -43,11 +44,17 @@ public class Label {
 		this.userId = userId;
 	}
 
+	public Date getLabelCreatedAt() {
+		return labelCreatedAt;
+	}
+
+	public void setLabelCreatedAt(Date labelCreatedAt) {
+		this.labelCreatedAt = labelCreatedAt;
+	}
+
 	@Override
 	public String toString() {
-		return "LabelDTO [labelId=" + labelId + ", labelName=" + labelName + ", userId=" + userId
-				+ "]";
+		return "Label [labelId=" + labelId + ", labelName=" + labelName + ", userId=" + userId + ", createdAt="
+				+ labelCreatedAt + "]";
 	}
-	
-	
 }

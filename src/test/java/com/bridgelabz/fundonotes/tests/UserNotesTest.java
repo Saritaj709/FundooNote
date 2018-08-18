@@ -1,4 +1,4 @@
-/*package com.bridgelabz.fundonotes.tests;
+package com.bridgelabz.fundonotes.tests;
 
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 
@@ -34,8 +34,8 @@ public class UserNotesTest{
 
 	}
 	
-	*//*********************************************************************************************************//*
-	      *//*****Tests For User****************//*
+	/*********************************************************************************************************/
+	      /*****Tests For User****************/
 	
 	//@Test
 	public void userRegisterTest() throws Exception {
@@ -83,8 +83,8 @@ public class UserNotesTest{
 	
 	
 	
-	*//*********************************************************************************************//*
-	        *//**Tests for NoteController**//*
+	/*********************************************************************************************/
+	        /**Tests for NoteController**/
 	
 	//@Test
 	public void noteRegisterTest() throws Exception {
@@ -147,4 +147,3 @@ public class UserNotesTest{
 				}
 
 }
-*/

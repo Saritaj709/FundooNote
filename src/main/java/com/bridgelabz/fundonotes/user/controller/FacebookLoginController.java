@@ -6,6 +6,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.bridgelabz.fundonotes.user.exception.RegistrationException;
 import com.bridgelabz.fundonotes.user.services.SocialLoginService;
 
 @RestController
@@ -26,7 +27,7 @@ public class FacebookLoginController {
 	}
 
 	@GetMapping("/getName")
-	public String getNameResponse() {
+	public Object getNameResponse() throws RegistrationException {
 		return facebookService.getName();
 	}
 }

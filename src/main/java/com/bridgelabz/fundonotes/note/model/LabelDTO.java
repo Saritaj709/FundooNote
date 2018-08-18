@@ -1,9 +1,12 @@
 package com.bridgelabz.fundonotes.note.model;
 
+import java.util.Date;
+
 public class LabelDTO {
 
 	private String labelId;
 	private String labelName;
+	private Date labelCreatedAt;
 
 	public String getLabelId() {
 		return labelId;
@@ -21,9 +24,17 @@ public class LabelDTO {
 		this.labelName = labelName;
 	}
 
+	public Date getLabelCreatedAt() {
+		return labelCreatedAt;
+	}
+
+	public void setLabelCreatedAt(Date labelCreatedAt) {
+		this.labelCreatedAt = labelCreatedAt;
+	}
+
 	@Override
 	public String toString() {
-		return "ViewLabelDTO [labelId=" + labelId + ", labelName=" + labelName + "]";
+		return "LabelDTO [labelId=" + labelId + ", labelName=" + labelName + ", createdAt=" + labelCreatedAt + "]";
 	}
 
 }

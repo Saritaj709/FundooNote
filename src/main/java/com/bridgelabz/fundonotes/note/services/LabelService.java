@@ -12,6 +12,14 @@ import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.LabelDTO;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
 public interface LabelService {
 
 	/**
@@ -91,5 +99,20 @@ public interface LabelService {
 	 * @throws UnAuthorizedException
 	 */
 	void removeLabelFromNote(String userId, String noteId, String labelId) throws LabelNotFoundException, NoteNotFoundException, UnAuthorizedException;
+
+	/**
+	 * @param userId
+	 * @param order
+	 * @return LabelDTO sorted by name
+	 * @throws NullValueException
+	 */
+	List<LabelDTO> sortLabelsByDateOrName(String userId, String order,String choice) throws NullValueException;
+
+	/**
+	 * @param userId
+	 * @param order
+	 * @throws NullValueException 
+	 */
+	List<LabelDTO> sortLabelsByDate(String userId, String order) throws NullValueException;
 
 }

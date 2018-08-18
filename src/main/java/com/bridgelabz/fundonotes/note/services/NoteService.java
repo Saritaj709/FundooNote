@@ -1,6 +1,5 @@
 package com.bridgelabz.fundonotes.note.services;
 
-import java.io.IOException;
 import java.util.Date;
 import java.util.List;
 
@@ -21,9 +20,16 @@ import com.bridgelabz.fundonotes.note.exception.UrlAdditionException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.CreateDTO;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
-import com.bridgelabz.fundonotes.note.model.UrlMetaData;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
 public interface NoteService {
 	
 	/**
@@ -205,17 +211,6 @@ public interface NoteService {
    	
 	/**
 	 * @param userId
-	 * @param metaData
-	 * @return UrlMetaData
-	 * @throws IOException 
-	 * @throws NoteNotFoundException 
-	 * @throws UnAuthorizedException 
-	 * @throws MalFormedException 
-	 */
-	List<UrlMetaData> addContent(String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException;
-
-	/**
-	 * @param userId
 	 * @param noteId
 	 * @param url
 	 * @throws MalFormedException 
@@ -224,4 +219,20 @@ public interface NoteService {
 	 * @throws UrlAdditionException 
 	 */
 	void addContentToNote(String userId,String noteId,String url) throws MalFormedException, NoteNotFoundException, UnAuthorizedException, UrlAdditionException;
+	
+	/**
+	 * @param userId
+	 * @param order
+	 * @return noteDTO sorted by date
+	 * @throws NullValueException
+	 */
+	List<ViewNoteDTO> viewNotesBySortedDate(String userId,String order,String choice) throws NullValueException;
+
+	/**
+	 * @param userId
+	 * @param order
+	 * @return noteDTo sorted by title
+	 * @throws NullValueException
+	 */
+	List<ViewNoteDTO> viewNotesBySortedTitle(String userId, String order) throws NullValueException;
 }

@@ -1,7 +1,7 @@
 package com.bridgelabz.fundonotes.note.services;
 
-import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
@@ -10,10 +10,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import org.apache.commons.validator.routines.UrlValidator;
-import org.jsoup.Jsoup;
-import org.jsoup.nodes.Document;
-import org.jsoup.nodes.Element;
-import org.jsoup.select.Elements;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
@@ -51,21 +47,24 @@ public class NoteServiceImpl implements NoteService {
 
 	@Autowired
 	private NoteRepository noteRepository;
-	
+
 	@Autowired
 	private ModelMapper modelMapper;
 
 	@Autowired
 	private ElasticRepositoryForLabel labelElasticRepository;
-	
+
 	@Autowired
 	private ElasticRepositoryForNote noteElasticRepository;
-	
+
 	@Autowired
 	private LabelService labelService;
-	
+
 	@Autowired
 	private Environment environment;
+	
+	@Autowired
+	private ContentScrapService scrap;
 
 	/**
 	 * 
@@ -78,11 +77,12 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws DateException
 	 * @throws LabelNotFoundException
 	 * @throws NullValueException
-	 * @throws MalFormedException 
+	 * @throws MalFormedException
 	 */
 	@Override
-	public ViewNoteDTO createNote(String userId, CreateDTO createDto) throws NoteNotFoundException, NoteCreationException,
-			UnAuthorizedException, DateException, LabelNotFoundException, NullValueException, MalFormedException {
+	public ViewNoteDTO createNote(String userId, CreateDTO createDto)
+			throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException,
+			LabelNotFoundException, NullValueException, MalFormedException {
 
 		NoteUtility.validateNoteCreation(createDto);
 
@@ -92,146 +92,139 @@ public class NoteServiceImpl implements NoteService {
 				|| createDto.getColor().trim().length() == 0) {
 			note.setColor(environment.getProperty("Color"));
 		}
-		
+
 		if (createDto.getReminder().before(new Date())) {
 			throw new DateException(environment.getProperty("DateException"));
 
 		}
-		
+
 		note.setUserId(userId);
 		note.setCreatedAt(new Date());
 		note.setLastModifiedAt(new Date());
 
 		for (int i = 0; i < createDto.getLabels().size(); i++) {
 
-			List<Label> labels = labelElasticRepository.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(),userId);
-			
+			List<Label> labels = labelElasticRepository
+					.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(), userId);
+
 			if (labels.isEmpty()) {
-			
+
 				labelService.createLabel(userId, createDto.getLabels().get(i).getLabelName());
-				
-				List<Label> labels1 = labelElasticRepository.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(),userId);
-				
+
+				List<Label> labels1 = labelElasticRepository
+						.findByLabelNameAndUserId(createDto.getLabels().get(i).getLabelName(), userId);
+
 				note.setLabels(labels1);
 
 			}
 		}
-		
-		if(createDto.getDescription().startsWith("http://")||createDto.getDescription().startsWith("https://")) {
-		UrlValidator validateUrl=new UrlValidator();
-			if(validateUrl.isValid(createDto.getDescription()));
-		
-		List<UrlMetaData> metaData=addContent(createDto.getDescription());
-		note.setMetaData(metaData);
+
+		String[] contents=createDto.getDescription().split(" ");
+		if(contents.length>0) {
+			
+					List<UrlMetaData> metaData=scrap.addSplitContent(createDto.getDescription());
+					note.setMetaData(metaData);
 		}
-		List<String> descriptionList=new ArrayList<>();
+		List<String> descriptionList = new ArrayList<>();
 		descriptionList.add(createDto.getDescription());
 		note.setDescription(descriptionList);
 		noteRepository.save(note);
-        
+
 		noteElasticRepository.save(note);
 		System.out.println(note);
-		
-		ViewNoteDTO viewNoteDto=modelMapper.map(note,ViewNoteDTO.class);
-		
+
+		ViewNoteDTO viewNoteDto = modelMapper.map(note, ViewNoteDTO.class);
+
 		return viewNoteDto;
 
 	}
-	
-	/**
-	 * @param userId
-	 * @param metaData
-	 * @return 
-	 * @throws IOException 
-	 * @throws NoteNotFoundException 
-	 * @throws UnAuthorizedException 
-	 * @throws MalFormedException 
-	 */
-	@Override
-	public  List<UrlMetaData> addContent(String url)
-			throws NoteNotFoundException, UnAuthorizedException, MalFormedException {
 
-		List<UrlMetaData> urlList = new ArrayList<>();
-
-		Document doc;
-		try {
-			doc = Jsoup.connect(url).get();
-		} catch (IOException e) {
-			throw new MalFormedException(environment.getProperty("MalFormedException"));
-		}
-
-		String keywords = doc.select(environment.getProperty("KEYWORDS")).first()
-				.attr(environment.getProperty("CONTENT"));
-		String description = doc.select(environment.getProperty("DESCRIPTION")).get(0)
-				.attr(environment.getProperty("CONTENT"));
-		Elements images = doc.select(environment.getProperty("IMAGES"));
-		UrlMetaData metaData = new UrlMetaData();
-		metaData.setUrl(url);
-		metaData.setKeywords(keywords);
-		metaData.setDescription(description);
-		for (Element image : images) {
-			metaData.setImageUrl(image.absUrl("src"));
-		}
-		urlList.add(metaData);
-		return urlList;
-	}
-	
 	/**
 	 * @param userId
 	 * @param noteId
 	 * @param url
-	 * @throws MalFormedException 
-	 * @throws NoteNotFoundException 
-	 * @throws UnAuthorizedException 
-	 * @throws UrlAdditionException 
+	 * @throws MalFormedException
+	 * @throws NoteNotFoundException
+	 * @throws UnAuthorizedException
+	 * @throws UrlAdditionException
 	 */
 	@Override
-	public void addContentToNote(String userId, String noteId, String url) throws MalFormedException, NoteNotFoundException, UnAuthorizedException, UrlAdditionException {
-		
-		Optional<Note> optionalNote=noteElasticRepository.findByNoteId(noteId);
-		if(!optionalNote.isPresent()) {
+	public void addContentToNote(String userId, String noteId, String url)
+			throws MalFormedException, NoteNotFoundException, UnAuthorizedException, UrlAdditionException {
+
+		Optional<Note> optionalNote = noteElasticRepository.findByNoteId(noteId);
+		if (!optionalNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-		
-		Note note=optionalNote.get();
-		if(!note.getUserId().equals(userId)) {
+
+		Note note = optionalNote.get();
+		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
-		
-        List<UrlMetaData> listMetaData=new ArrayList<>();
 
-		listMetaData = note.getMetaData();
-		
-		List<String> descriptionList=new ArrayList<>();
-       if(listMetaData!=null) {
-		
-    	  if(descriptionList!=null) {
-    		  
-    		  descriptionList=note.getDescription();
-	        for(int i=0;i<descriptionList.size();i++) {
-		
-				if (note.getDescription().get(i).equals(url)) {
+		List<String> descriptionList = new ArrayList<>();
+
+		String[] contents=url.split(" ");
+
+		if (descriptionList != null) {
+
+			descriptionList = note.getDescription();
+
+			for (int i = 0; i < descriptionList.size(); i++) {
+
+				if(contents.length>0) {
+					
+					for(int j=0;j<contents.length;j++) {
+						UrlValidator validator=new UrlValidator();
+						if(validator.isValid(contents[j])) {
+				if (descriptionList.contains(contents[j])) {
 					throw new UrlAdditionException(environment.getProperty("UrlAdditionException"));
+							}
+				descriptionList.add(url);
+
+						}
+					}
 				}
 			}
-	        
-	        descriptionList.add(url);
-	       List<String> desList=descriptionList;
+			List<String> desList = descriptionList;
 			note.setDescription(desList);
-    	  }
-			List<UrlMetaData> data=addContent(url);
 			
-			listMetaData.addAll(data);
-
-			note.setMetaData(listMetaData);
 		}
-		else {
+
+		List<UrlMetaData> listMetaData = new ArrayList<>();
+		
+		listMetaData = note.getMetaData();
+
+		if (listMetaData != null) {
+			
+			if(contents.length>0) {
+				List<UrlMetaData> metaData=scrap.addSplitContent(url);
+
+			listMetaData.addAll(metaData);
 			note.setMetaData(listMetaData);
+
+					}
+			if(contents.length==0) {
+			List<UrlMetaData> data=scrap.addContent(url);
+            listMetaData.addAll(data);
+			note.setMetaData(listMetaData);
+			}
+		} else {
+		
+			if(contents.length>0) {
+				List<UrlMetaData> metaData=scrap.addSplitContent(url);
+
+						note.setMetaData(metaData);
+			}
+			if(contents.length==0) {
+			List<UrlMetaData> data = scrap.addContent(url);
+			note.setMetaData(data);
+			}
 		}
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
 	}
-	
+
 	/**
 	 * 
 	 * @param token
@@ -247,29 +240,29 @@ public class NoteServiceImpl implements NoteService {
 			throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException, LabelAdditionException {
 
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
-		
+
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
-		Note note=checkNote.get();
+		Note note = checkNote.get();
 
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
-		
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
-		//List<Label> labels = labelRepository.findByLabelIdAndUserId(labelId,userId);
+		// List<Label> labels = labelRepository.findByLabelIdAndUserId(labelId,userId);
 
-		List<Label> labels = labelElasticRepository.findByLabelIdAndUserId(labelId,userId);
-		
+		List<Label> labels = labelElasticRepository.findByLabelIdAndUserId(labelId, userId);
+
 		if (labels.isEmpty()) {
 			throw new NoSuchLabelException(environment.getProperty("NoSuchLabelException"));
 		}
-	
+
 		List<Label> tempList = new LinkedList<>();
 
 		tempList = note.getLabels();
@@ -291,7 +284,7 @@ public class NoteServiceImpl implements NoteService {
 			note.setLabels(labels);
 		}
 		noteRepository.save(note);
-		
+
 		noteElasticRepository.save(note);
 
 	}
@@ -309,28 +302,28 @@ public class NoteServiceImpl implements NoteService {
 	public void removeLabelFromNote(String userId, String noteId, String labelId)
 			throws LabelNotFoundException, NoteNotFoundException, UnAuthorizedException {
 
-		//Optional<Label> optionalLabel = labelRepository.findByLabelId(labelId);
-		
+		// Optional<Label> optionalLabel = labelRepository.findByLabelId(labelId);
+
 		Optional<Label> optionalLabel = labelElasticRepository.findByLabelId(labelId);
 		if (!optionalLabel.isPresent()) {
 			throw new LabelNotFoundException(environment.getProperty("LabelNotFoundException"));
 		}
-        
-		Label label=optionalLabel.get();
-		
-		//Optional<Note> optionalNote = noteRepository.findByNoteId(noteId);
+
+		Label label = optionalLabel.get();
+
+		// Optional<Note> optionalNote = noteRepository.findByNoteId(noteId);
 		Optional<Note> optionalNote = noteElasticRepository.findByNoteId(noteId);
 		if (!optionalNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-		
+
 		Note note = optionalNote.get();
 
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
-		
-		if(!label.getUserId().equals(userId)) {
+
+		if (!label.getUserId().equals(userId)) {
 			throw new UnAuthorizedException("this particular label is not authorized for given user");
 		}
 
@@ -342,7 +335,7 @@ public class NoteServiceImpl implements NoteService {
 			}
 		}
 	}
-	
+
 	/**
 	 * 
 	 * @param token
@@ -360,9 +353,9 @@ public class NoteServiceImpl implements NoteService {
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-	
-		Note note=checkNote.get();
-		
+
+		Note note = checkNote.get();
+
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
@@ -370,8 +363,6 @@ public class NoteServiceImpl implements NoteService {
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
-
-		
 
 		Note note1 = modelMapper.map(updateDto, Note.class);
 
@@ -393,13 +384,14 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<ViewNoteDTO> viewTrashed(String userId) throws NullValueException {
 
-		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId,true);
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, true);
 
 		if (noteList == null) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
 
-		return noteList.stream().map(filterNote-> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		return noteList.stream().map(filterNote -> modelMapper.map(filterNote, ViewNoteDTO.class))
+				.collect(Collectors.toList());
 	}
 
 	/**
@@ -410,7 +402,7 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<ViewNoteDTO> readAllNotes() throws NullValueException {
 
-		//List<Note> noteList = noteRepository.findAll();
+		// List<Note> noteList = noteRepository.findAll();
 		List<Note> noteList = noteRepository.findAll();
 
 		if (noteList == null) {
@@ -439,16 +431,17 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<ViewNoteDTO> readUserNotes(String userId) throws NullValueException {
 
-		//List<Note> noteList = noteRepository.findAllByUserId(userId);
-		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId,false);
+		// List<Note> noteList = noteRepository.findAllByUserId(userId);
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
 		if (noteList.isEmpty()) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
-		
-		List<ViewNoteDTO> pin=noteList.stream().filter(noteStream->noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
-		List<ViewNoteDTO> unPin=noteList.stream().filter(noteStream->!noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
-	return	Stream.concat(pin.stream(), unPin.stream())
-		   .collect(Collectors.toList());
+
+		List<ViewNoteDTO> pin = noteList.stream().filter(noteStream -> noteStream.isPin())
+				.map(filterNote -> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		List<ViewNoteDTO> unPin = noteList.stream().filter(noteStream -> !noteStream.isPin())
+				.map(filterNote -> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		return Stream.concat(pin.stream(), unPin.stream()).collect(Collectors.toList());
 	}
 
 	/**
@@ -464,20 +457,20 @@ public class NoteServiceImpl implements NoteService {
 	public ViewNoteDTO findNoteById(String userId, String noteId)
 			throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException {
 
-		//Optional<Note> checkNote = noteRepository.findById(noteId);
-		
+		// Optional<Note> checkNote = noteRepository.findById(noteId);
+
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
-		Note note=checkNote.get();
-		
+		Note note = checkNote.get();
+
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
-		
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
@@ -491,20 +484,20 @@ public class NoteServiceImpl implements NoteService {
 	public void deleteNoteForever(String userId, String noteId)
 			throws NoteNotFoundException, UnAuthorizedException, UntrashedException, NoteTrashedException {
 
-		//Optional<Note> checkNote = noteRepository.findByNoteId(noteId);
-		
+		// Optional<Note> checkNote = noteRepository.findByNoteId(noteId);
+
 		Optional<Note> checkNote = noteElasticRepository.findByNoteId(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-        
-		Note note=checkNote.get();
-		
+
+		Note note = checkNote.get();
+
 		if (!note.isTrashed()) {
 			throw new UntrashedException(environment.getProperty("UntrashedException"));
 		}
-		
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
@@ -525,21 +518,21 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public void addColor(String userId, String color, String noteId)
 			throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException {
-		
-		//Optional<Note> checkNote = noteRepository.findById(noteId);
-		
+
+		// Optional<Note> checkNote = noteRepository.findById(noteId);
+
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-         
-		Note note=checkNote.get();
-		
+
+		Note note = checkNote.get();
+
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
-		
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
@@ -547,7 +540,7 @@ public class NoteServiceImpl implements NoteService {
 		note.setColor(color);
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
-		
+
 	}
 
 	/**
@@ -568,16 +561,16 @@ public class NoteServiceImpl implements NoteService {
 		if (date.before(new Date())) {
 			throw new DateException(environment.getProperty("DateException"));
 		}
-		
-	//	Optional<Note> checkNote = noteRepository.findById(noteId);
-		
+
+		// Optional<Note> checkNote = noteRepository.findById(noteId);
+
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-		
-		Note note=checkNote.get();
+
+		Note note = checkNote.get();
 
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
@@ -585,10 +578,10 @@ public class NoteServiceImpl implements NoteService {
 
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty(" UnAuthorizedException"));
-		}	
-		
+		}
+
 		note.setReminder(date);
-		
+
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
 
@@ -607,14 +600,14 @@ public class NoteServiceImpl implements NoteService {
 	public void deleteReminder(String userId, String noteId)
 			throws NullValueException, UnAuthorizedException, NoteNotFoundException, NoteTrashedException {
 
-		//Optional<Note> checkNote = noteRepository.findById(noteId);
+		// Optional<Note> checkNote = noteRepository.findById(noteId);
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-		
-		Note note=checkNote.get();
+
+		Note note = checkNote.get();
 
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
@@ -639,25 +632,25 @@ public class NoteServiceImpl implements NoteService {
 	public void archieveOrUnArchieveNote(String userId, String noteId, boolean choice) throws NoteNotFoundException,
 			UnAuthorizedException, NoteArchievedException, NoteTrashedException, NoteUnArchievedException {
 
-		//Optional<Note> checkNote = noteRepository.findById(noteId);
-		
+		// Optional<Note> checkNote = noteRepository.findById(noteId);
+
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
-		
+
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
-		Note note=checkNote.get();
-		
+		Note note = checkNote.get();
+
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
-		
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
-			note.setArchieve(choice);
+		note.setArchieve(choice);
 
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
@@ -670,15 +663,16 @@ public class NoteServiceImpl implements NoteService {
 	 */
 	@Override
 	public List<ViewNoteDTO> viewArchieved(String userId) throws NullValueException {
-		
-		//List<Note> noteList = noteRepository.findAll();
-		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId,false);
+
+		// List<Note> noteList = noteRepository.findAll();
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
 
 		if (noteList == null) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
 
-		return noteList.stream().filter(noteStream->noteStream.isArchieve()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+		return noteList.stream().filter(noteStream -> noteStream.isArchieve())
+				.map(filterNote -> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -695,24 +689,24 @@ public class NoteServiceImpl implements NoteService {
 	public void pinOrUnpinNote(String userId, String noteId, boolean choice) throws NoteNotFoundException,
 			UnAuthorizedException, NotePinnedException, NoteTrashedException, NoteUnPinnedException {
 
-		//Optional<Note> checkNote = noteRepository.findById(noteId);
+		// Optional<Note> checkNote = noteRepository.findById(noteId);
 		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
-		
-		Note note=checkNote.get();
+
+		Note note = checkNote.get();
 
 		if (note.isTrashed()) {
 			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
 		}
-		
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
 
-			note.setPin(choice);
+		note.setPin(choice);
 
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
@@ -726,15 +720,16 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<ViewNoteDTO> viewPinned(String userId) throws NullValueException {
 
-		//List<Note> notes = noteRepository.findAll();
-		List<Note> notes = noteElasticRepository.findAllByUserIdAndTrashed(userId,false);
-		//List<Note> notes = noteElasticRepository.findAllByUserId(userId);
+		// List<Note> notes = noteRepository.findAll();
+		List<Note> notes = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
+		// List<Note> notes = noteElasticRepository.findAllByUserId(userId);
 
 		if (notes == null) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
-       
-		return notes.stream().filter(noteStream->noteStream.isPin()).map(filterNote->modelMapper.map(filterNote,ViewNoteDTO.class)).collect(Collectors.toList());
+
+		return notes.stream().filter(noteStream -> noteStream.isPin())
+				.map(filterNote -> modelMapper.map(filterNote, ViewNoteDTO.class)).collect(Collectors.toList());
 	}
 
 	/**
@@ -752,22 +747,88 @@ public class NoteServiceImpl implements NoteService {
 			throws NoteNotFoundException, UnAuthorizedException, UntrashedException, NoteTrashedException {
 
 		Optional<Note> checkNote = noteRepository.findByNoteId(noteId);
-		//Optional<Note> checkNote = noteElasticRepository.findByNoteId(noteId);
+		// Optional<Note> checkNote = noteElasticRepository.findByNoteId(noteId);
 
 		if (!checkNote.isPresent()) {
 			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
 		}
 
-		Note note=checkNote.get();
-		
+		Note note = checkNote.get();
+
 		if (!note.getUserId().equals(userId)) {
 			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
 		}
-		
-			note.setTrashed(choice);
-			
+
+		note.setTrashed(choice);
+
 		noteRepository.save(note);
 		noteElasticRepository.save(note);
+	}
+
+	/**
+	 * @param userId
+	 * @param order
+	 * @return noteDTO sorted by title
+	 * @throws NullValueException
+	 */
+	@Override
+	public List<ViewNoteDTO> viewNotesBySortedTitle(String userId, String order) throws NullValueException {
+
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
+		if (noteList.isEmpty()) {
+			throw new NullValueException(environment.getProperty("NullValueException"));
+		}
+
+		if (order.equals("asc")) {
+			return noteList.stream().sorted(Comparator.comparing(Note::getTitle))
+					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		}
+
+		if (order.equals("desc")) {
+
+			return noteList.stream().sorted(Comparator.comparing(Note::getTitle).reversed())
+					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		}
+		return null;
+	}
+	
+	/**
+	 * @param userId
+	 * @param order
+	 * @return noteDTO sorted by date
+	 * @throws NullValueException
+	 */
+	@Override
+	public List<ViewNoteDTO> viewNotesBySortedDate(String userId, String order,String choice) throws NullValueException {
+
+		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
+		if (noteList.isEmpty()) {
+			throw new NullValueException(environment.getProperty("NullValueException"));
+		}
+
+		if(choice.equals("date")) {
+			
+		if (order.equalsIgnoreCase("asc")) {
+			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt))
+					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		}
+
+			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed())
+					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());		
+		}
+		
+		if(choice.equals("title")) {
+				
+			if (order.equals("desc")) {
+
+				return noteList.stream().sorted(Comparator.comparing(Note::getTitle).reversed())
+						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+			}
+			return noteList.stream().sorted(Comparator.comparing(Note::getTitle))
+					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+
+		}
+		return null;
 	}
 
 }

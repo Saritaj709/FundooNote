@@ -41,6 +41,7 @@ import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.UpdateDTO;
 import com.bridgelabz.fundonotes.note.model.UrlMetaData;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
+import com.bridgelabz.fundonotes.note.services.ContentScrapService;
 import com.bridgelabz.fundonotes.note.services.NoteService;
 
 /**
@@ -54,6 +55,9 @@ public class NoteController {
 
 	@Autowired
 	private NoteService noteService;
+	
+	@Autowired
+	private ContentScrapService scrapService;
 
 	// -------------Create A New Note----------------------
 	/**
@@ -94,13 +98,13 @@ public class NoteController {
 	@PostMapping(value="/scrap")
 	public ResponseEntity<List<UrlMetaData>> createContent(HttpServletRequest req,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException{
 		String userId=(String) req.getAttribute("userId");
-		List<UrlMetaData> urlMetaData=noteService.addContent(url);
+		List<UrlMetaData> urlMetaData=scrapService.addContent(url);
 		return new ResponseEntity<>(urlMetaData,HttpStatus.CREATED);
 	}
 
 	//--------------------Add Content To Particular Note------------
 	@PostMapping(value="/addscrap-to-note")
-	public ResponseEntity<Response> addContentTo(HttpServletRequest req,@RequestParam(value="noteId")String noteId,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException, UrlAdditionException{
+	public ResponseEntity<Response> addContentToNote(HttpServletRequest req,@RequestParam(value="noteId")String noteId,@RequestParam(value="link-url")String url) throws IOException, NoteNotFoundException, UnAuthorizedException, MalFormedException, UrlAdditionException{
 		
 		String userId=(String) req.getAttribute("userId");
 		noteService.addContentToNote(userId,noteId,url);
@@ -471,7 +475,7 @@ public class NoteController {
 			@PathVariable String noteId) throws NoteCreationException, UnAuthorizedException, NoteNotFoundException,
 			NoteTrashedException, DateException {
 
-		String userId = (String) req.getAttribute("userId"); //
+		String userId = (String) req.getAttribute("userId"); 
 
 		noteService.addColor(userId, color, noteId);
 
@@ -541,5 +545,36 @@ public class NoteController {
 		response.setStatus(9);
 
 		return new ResponseEntity<>(response, HttpStatus.OK);
+	}
+	
+	//------------------Sort Note By Date or Title-------------------------
+	/**
+	 * @param req
+	 * @param order
+	 * @return noteDTO sorted by date
+	 * @throws NullValueException
+	 */
+	@GetMapping(value = "/sort-notes-by-date-or-title")
+	public ResponseEntity<List<ViewNoteDTO>> viewNotesBySortedDateOrTitle(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order,@RequestParam(value="sortBy,date/title")String choice) throws NullValueException {
+
+		String userId=(String) req.getAttribute("userId");
+		noteService.viewNotesBySortedDate(userId,order,choice);
+
+		return new ResponseEntity<>(noteService.viewNotesBySortedDate(userId,order,choice), HttpStatus.OK);
+	}
+	
+	/**
+	 * @param req
+	 * @param order
+	 * @return noteDTO sorted by title
+	 * @throws NullValueException
+	 */
+	@GetMapping(value = "/sort-notes-by-title")
+	public ResponseEntity<List<ViewNoteDTO>> viewNotesBySortedTitle(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order) throws NullValueException {
+
+		String userId=(String) req.getAttribute("userId");
+		noteService.viewNotesBySortedTitle(userId,order);
+
+		return new ResponseEntity<>(noteService.viewNotesBySortedTitle(userId,order), HttpStatus.OK);
 	}
 }

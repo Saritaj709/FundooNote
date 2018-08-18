@@ -29,6 +29,10 @@ import com.bridgelabz.fundonotes.note.model.Response;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.services.LabelService;
 
+/**
+ * @author bridgelabz
+ *
+ */
 @RestController
 @RequestMapping("/api/labels")
 public class LabelController {
@@ -221,5 +225,36 @@ public class LabelController {
 			response.setStatus(19);
 
 			return new ResponseEntity<>(response, HttpStatus.CREATED);
+		}
+		
+	//--------------Sort Label By Date Or Name------------------------	
+		/**
+		 * @param req
+		 * @param order
+		 * @return LabelDTO in sorted order
+		 * @throws NullValueException
+		 */
+		@PostMapping(value = "/sort-labels-by-date-or-name")
+		public ResponseEntity<List<LabelDTO>> sortLabelsByDateOrName(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order,@RequestParam(value="sortBy,date/name")String choice) throws NullValueException {
+
+			String userId=(String) req.getAttribute("userId");
+			labelService.sortLabelsByDateOrName(userId,order,choice);
+
+			return new ResponseEntity<>(labelService.sortLabelsByDateOrName(userId,order,choice), HttpStatus.OK);
+		}
+		
+		/**
+		 * @param req
+		 * @param order
+		 * @return LabelDTO in sorted order
+		 * @throws NullValueException
+		 */
+		@PostMapping(value = "/sort-labels-by-Date")
+		public ResponseEntity<List<LabelDTO>> sortLabelsByDate(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order) throws NullValueException {
+
+			String userId=(String) req.getAttribute("userId");
+			labelService.sortLabelsByDate(userId,order);
+
+			return new ResponseEntity<>(labelService.sortLabelsByDate(userId,order), HttpStatus.OK);
 		}
 }
