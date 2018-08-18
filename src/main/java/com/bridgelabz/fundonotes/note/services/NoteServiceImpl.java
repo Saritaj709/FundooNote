@@ -179,13 +179,12 @@ public class NoteServiceImpl implements NoteService {
 						if(validator.isValid(contents[j])) {
 				if (descriptionList.contains(contents[j])) {
 					throw new UrlAdditionException(environment.getProperty("UrlAdditionException"));
-							}
-				descriptionList.add(url);
-
+							}	
 						}
 					}
 				}
 			}
+			descriptionList.add(url);
 			List<String> desList = descriptionList;
 			note.setDescription(desList);
 			
