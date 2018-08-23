@@ -62,7 +62,7 @@ public class NoteServiceImpl implements NoteService {
 
 	@Autowired
 	private Environment environment;
-	
+
 	@Autowired
 	private ContentScrapService scrap;
 
@@ -119,11 +119,11 @@ public class NoteServiceImpl implements NoteService {
 			}
 		}
 
-		String[] contents=createDto.getDescription().split(" ");
-		if(contents.length>0) {
-			
-					List<UrlMetaData> metaData=scrap.addSplitContent(createDto.getDescription());
-					note.setMetaData(metaData);
+		String[] contents = createDto.getDescription().split(" ");
+		if (contents.length > 0) {
+
+			List<UrlMetaData> metaData = scrap.addSplitContent(createDto.getDescription());
+			note.setMetaData(metaData);
 		}
 		List<String> descriptionList = new ArrayList<>();
 		descriptionList.add(createDto.getDescription());
@@ -164,60 +164,58 @@ public class NoteServiceImpl implements NoteService {
 
 		List<String> descriptionList = new ArrayList<>();
 
-		String[] contents=url.split(" ");
+		String[] contents = url.split(" ");
 
-		if (descriptionList != null) {
+		descriptionList = note.getDescription();
+		// if (descriptionList != null) {
 
-			descriptionList = note.getDescription();
+		for (int i = 0; i < descriptionList.size(); i++) {
 
-			for (int i = 0; i < descriptionList.size(); i++) {
+			// if(contents.length>0) {
 
-				if(contents.length>0) {
-					
-					for(int j=0;j<contents.length;j++) {
-						UrlValidator validator=new UrlValidator();
-						if(validator.isValid(contents[j])) {
-				if (descriptionList.contains(contents[j])) {
+			for (int j = 0; j < contents.length; j++) {
+				UrlValidator validator = new UrlValidator();
+				if (validator.isValid(contents[j]) && descriptionList.contains(contents[j])) {
+					// if (descriptionList.contains(contents[j])) {
 					throw new UrlAdditionException(environment.getProperty("UrlAdditionException"));
-							}	
-						}
-					}
 				}
 			}
-			descriptionList.add(url);
-			List<String> desList = descriptionList;
-			note.setDescription(desList);
-			
 		}
+		// }
+		// }
+		// }
+		descriptionList.add(url);
+		List<String> desList = descriptionList;
+		note.setDescription(desList);
 
 		List<UrlMetaData> listMetaData = new ArrayList<>();
-		
+
 		listMetaData = note.getMetaData();
 
 		if (listMetaData != null) {
-			
-			if(contents.length>0) {
-				List<UrlMetaData> metaData=scrap.addSplitContent(url);
 
-			listMetaData.addAll(metaData);
-			note.setMetaData(listMetaData);
+			if (contents.length > 0) {
+				List<UrlMetaData> metaData = scrap.addSplitContent(url);
 
-					}
-			if(contents.length==0) {
-			List<UrlMetaData> data=scrap.addContent(url);
-            listMetaData.addAll(data);
-			note.setMetaData(listMetaData);
+				listMetaData.addAll(metaData);
+				note.setMetaData(listMetaData);
+
+			}
+			if (contents.length == 0) {
+				List<UrlMetaData> data = scrap.addContent(url);
+				listMetaData.addAll(data);
+				note.setMetaData(listMetaData);
 			}
 		} else {
-		
-			if(contents.length>0) {
-				List<UrlMetaData> metaData=scrap.addSplitContent(url);
 
-						note.setMetaData(metaData);
+			if (contents.length > 0) {
+				List<UrlMetaData> metaData = scrap.addSplitContent(url);
+
+				note.setMetaData(metaData);
 			}
-			if(contents.length==0) {
-			List<UrlMetaData> data = scrap.addContent(url);
-			note.setMetaData(data);
+			if (contents.length == 0) {
+				List<UrlMetaData> data = scrap.addContent(url);
+				note.setMetaData(data);
 			}
 		}
 		noteRepository.save(note);
@@ -790,7 +788,7 @@ public class NoteServiceImpl implements NoteService {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * @param userId
 	 * @param order
@@ -798,35 +796,50 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws NullValueException
 	 */
 	@Override
-	public List<ViewNoteDTO> viewNotesBySortedDate(String userId, String order,String choice) throws NullValueException {
+	public List<ViewNoteDTO> viewNotesBySortedDate(String userId, String order, String choice)
+			throws NullValueException {
 
 		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
 		if (noteList.isEmpty()) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
-
-		if(choice.equals("date")) {
-			
-		if (order.equalsIgnoreCase("asc")) {
-			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt))
-					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
-		}
-
-			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed())
-					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());		
-		}
 		
-		if(choice.equals("title")) {
-				
+		if(choice==null&&order==null) {
+			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed())
+					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+		
+		}
+
+		if (choice.equals("date")) {
+
+			if (order==null||order.matches(".*")) {
+				return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed())
+						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+			}
+			
+			if (order.equalsIgnoreCase("asc")) {
+				return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt))
+						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+			}
+			
+		}
+
+		if (choice.equals("title")) {
+
+			if (order==null||order.matches(".*")) {
+				return noteList.stream().sorted(Comparator.comparing(Note::getTitle))
+						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
+
+				}
+			
 			if (order.equals("desc")) {
 
 				return noteList.stream().sorted(Comparator.comparing(Note::getTitle).reversed())
 						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
 			}
-			return noteList.stream().sorted(Comparator.comparing(Note::getTitle))
-					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
-
+			
 		}
+		
 		return null;
 	}
 

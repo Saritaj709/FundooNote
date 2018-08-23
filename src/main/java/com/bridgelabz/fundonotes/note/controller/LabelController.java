@@ -235,7 +235,7 @@ public class LabelController {
 		 * @throws NullValueException
 		 */
 		@PostMapping(value = "/sort-labels-by-date-or-name")
-		public ResponseEntity<List<LabelDTO>> sortLabelsByDateOrName(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order,@RequestParam(value="sortBy,date/name")String choice) throws NullValueException {
+		public ResponseEntity<List<LabelDTO>> sortLabelsByDateOrName(HttpServletRequest req,@RequestParam(value="order,asc/desc",required=false)String order,@RequestParam(value="sortBy,date/name",required=false)String choice) throws NullValueException {
 
 			String userId=(String) req.getAttribute("userId");
 			labelService.sortLabelsByDateOrName(userId,order,choice);

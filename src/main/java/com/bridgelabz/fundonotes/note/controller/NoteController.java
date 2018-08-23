@@ -555,7 +555,7 @@ public class NoteController {
 	 * @throws NullValueException
 	 */
 	@GetMapping(value = "/sort-notes-by-date-or-title")
-	public ResponseEntity<List<ViewNoteDTO>> viewNotesBySortedDateOrTitle(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order,@RequestParam(value="sortBy,date/title")String choice) throws NullValueException {
+	public ResponseEntity<List<ViewNoteDTO>> viewNotesBySortedDateOrTitle(HttpServletRequest req,@RequestParam(value="order,asc/desc",required=false)String order,@RequestParam(value="sortBy,date/title",required=false)String choice) throws NullValueException {
 
 		String userId=(String) req.getAttribute("userId");
 		noteService.viewNotesBySortedDate(userId,order,choice);
