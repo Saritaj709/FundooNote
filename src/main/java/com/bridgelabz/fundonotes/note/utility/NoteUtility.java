@@ -6,10 +6,9 @@ import com.bridgelabz.fundonotes.note.model.CreateDTO;
 
 public class NoteUtility {
 
-
 	public static void validateNoteCreation(CreateDTO createDto) throws NoteCreationException, NullValueException {
 
-		if (createDto.getDescription() == null && createDto.getTitle() == null) {
+		if (createDto.getDescription().length() == 0 && createDto.getTitle().length() == 0) {
 			throw new NoteCreationException("Both description and title cannot be null");
 		}
 
@@ -28,8 +27,11 @@ public class NoteUtility {
 
 	public static void validateLabelCreation(String labelName) throws NullValueException {
 
-		if (labelName == null || labelName.length() == 0 || labelName.trim().length() == 0) {
+		if (labelName.length() == 0 || labelName.trim().length() == 0) {
 			throw new NullValueException("Label name cannot be null");
+		}
+		if (labelName.length() > 20) {
+			throw new NullValueException("Label name cannot be more than 20 characters");
 		}
 	}
 }

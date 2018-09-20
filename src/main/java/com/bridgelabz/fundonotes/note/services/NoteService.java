@@ -1,7 +1,11 @@
 package com.bridgelabz.fundonotes.note.services;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
@@ -30,6 +34,34 @@ import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
  * @author bridgelabz
  *
  */
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
+/**
+ * @author bridgelabz
+ *
+ */
 public interface NoteService {
 	
 	/**
@@ -44,8 +76,9 @@ public interface NoteService {
 	 * @throws LabelNotFoundException
 	 * @throws NullValueException
 	 * @throws MalFormedException 
+	 * @throws IOException 
 	 */
-	ViewNoteDTO createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException, LabelNotFoundException, NullValueException, MalFormedException;
+	ViewNoteDTO createNote(String token,CreateDTO create) throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException, LabelNotFoundException, NullValueException, MalFormedException, IOException;
 
 	/**
 	 * 
@@ -226,7 +259,7 @@ public interface NoteService {
 	 * @return noteDTO sorted by date
 	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewNotesBySortedDate(String userId,String order,String choice) throws NullValueException;
+	List<ViewNoteDTO> viewNotesBySortedDateOrTitle(String userId,String order,String choice) throws NullValueException;
 
 	/**
 	 * @param userId
@@ -234,5 +267,31 @@ public interface NoteService {
 	 * @return noteDTo sorted by title
 	 * @throws NullValueException
 	 */
-	List<ViewNoteDTO> viewNotesBySortedTitle(String userId, String order) throws NullValueException;
+//	List<ViewNoteDTO> viewNotesBySortedTitle(String userId, String order) throws NullValueException;
+
+	/**
+	 * 
+	 * @param userId
+	 * @param noteId
+	 * @param image
+	 * @return 
+	 * @throws NoteNotFoundException
+	 * @throws NoteTrashedException
+	 * @throws UnAuthorizedException
+	 * @throws IOException
+	 */
+	void addImageToNote(String userId, String noteId, MultipartFile image) throws NoteNotFoundException, NoteTrashedException, UnAuthorizedException, IOException;
+
+	/**
+	 * 
+	 * @param userId
+	 * @param noteId
+	 * @param image
+	 * @return
+	 * @throws NoteNotFoundException
+	 * @throws NoteTrashedException
+	 * @throws UnAuthorizedException
+	 * @throws NullValueException
+	 */
+	String removeImageFromNote(String userId, String noteId, String image) throws NoteNotFoundException, NoteTrashedException, UnAuthorizedException, NullValueException;
 }

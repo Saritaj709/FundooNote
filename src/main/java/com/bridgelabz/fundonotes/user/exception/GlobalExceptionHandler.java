@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.bridgelabz.fundonotes.user.controller.UserController;
-import com.bridgelabz.fundonotes.user.model.ResponseDTO;
+import com.bridgelabz.fundonotes.user.model.ResponseDTOUser;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -16,34 +16,34 @@ public class GlobalExceptionHandler {
 	public static final Logger logger = LoggerFactory.getLogger(UserController.class);
 	
 	@ExceptionHandler(RegistrationException.class)
-	public ResponseEntity<ResponseDTO> register(RegistrationException e){
+	public ResponseEntity<ResponseDTOUser> register(RegistrationException e){
 		logger.error("Registration exception");
-		ResponseDTO response=new ResponseDTO();
-		response.setMessage("Registration error "+e.getMessage());
+		ResponseDTOUser response=new ResponseDTOUser();
+		response.setMessage("Registration error, "+e.getMessage());
 		response.setStatus(1101);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
 	@ExceptionHandler(LoginException.class)
-	public ResponseEntity<ResponseDTO> login(LoginException e){
+	public ResponseEntity<ResponseDTOUser> login(LoginException e){
 		logger.error("Login exception");
-		ResponseDTO response=new ResponseDTO();
+		ResponseDTOUser response=new ResponseDTOUser();
 		response.setMessage("Login error, "+e.getMessage());
 		response.setStatus(1102);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
 	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<ResponseDTO> userNotFoundExceptionHandler(UserNotFoundException e){
+	public ResponseEntity<ResponseDTOUser> userNotFoundExceptionHandler(UserNotFoundException e){
 		logger.error("User not found exception");
-		ResponseDTO response=new ResponseDTO();
+		ResponseDTOUser response=new ResponseDTOUser();
 		response.setMessage("User not found Exception, "+e.getMessage());
 		response.setStatus(1103);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(ActivationException.class)
-	public ResponseEntity<ResponseDTO> activationExceptionHandler(ActivationException e){
+	public ResponseEntity<ResponseDTOUser> activationExceptionHandler(ActivationException e){
 		logger.error("User account activation exception exception");
-		ResponseDTO response=new ResponseDTO();
+		ResponseDTOUser response=new ResponseDTOUser();
 		response.setMessage("User account activation Exception, "+e.getMessage());
 		response.setStatus(1104);
 		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);

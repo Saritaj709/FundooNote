@@ -111,22 +111,11 @@
 			<version>2.1.0</version>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-elasticsearch -->
-		<!-- <dependency> <groupId>org.springframework.data</groupId> <artifactId>spring-data-elasticsearch</artifactId> 
-			</dependency> -->
-		<!-- <dependency>
-			<groupId>org.springframework.data</groupId>
-			<artifactId>spring-data-elasticsearch</artifactId>
-
-		</dependency> -->
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-data-elasticsearch</artifactId>
 		</dependency>
 
-		<!-- <dependency> <groupId>org.springframework.boot</groupId> <artifactId>spring-boot-starter-data-redis</artifactId> 
-			</dependency> -->
-		<!-- https://mvnrepository.com/artifact/org.springframework.data/spring-data-redis -->
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-redis</artifactId>
@@ -154,6 +143,41 @@
 			<groupId>org.springframework.social</groupId>
 			<artifactId>spring-social-facebook</artifactId>
 			<version>2.0.3.RELEASE</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>aws-java-sdk</artifactId>
+			<version>1.11.163</version>
+		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/javax.jms/javax.jms-api -->
+		<dependency>
+			<groupId>javax.jms</groupId>
+			<artifactId>javax.jms-api</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework</groupId>
+			<artifactId>spring-jms</artifactId>
+		</dependency>
+
+		<dependency>
+			<groupId>com.amazonaws</groupId>
+			<artifactId>amazon-sqs-java-messaging-lib</artifactId>
+			<version>1.0.4</version>
+		</dependency>
+
+		<dependency>
+			<groupId>com.google.code.gson</groupId>
+			<artifactId>gson</artifactId>
+		</dependency>
+		
+		
+		<dependency>
+			<groupId>org.elasticsearch.client</groupId>
+			<artifactId>elasticsearch-rest-high-level-client</artifactId>
+			<version>6.1.2</version>
 		</dependency>
 
 

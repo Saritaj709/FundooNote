@@ -23,6 +23,8 @@ public interface NoteRepository extends MongoRepository<Note,String>{
 
 	List<Note> findAllByUserId(String userId);
 
+	List<Note> findAllByUserIdAndTrashed(String userId, boolean b);
+
 	//List<Note> findByAllUserId(String userId);
 
 }

@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.note.services;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
@@ -14,7 +15,11 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.AmazonS3Client;
+import com.bridgelabz.fundonotes.configurations.AwsConfigurations;
 import com.bridgelabz.fundonotes.note.exception.DateException;
 import com.bridgelabz.fundonotes.note.exception.LabelAdditionException;
 import com.bridgelabz.fundonotes.note.exception.LabelNotFoundException;
@@ -66,6 +71,12 @@ public class NoteServiceImpl implements NoteService {
 	@Autowired
 	private ContentScrapService scrap;
 
+	@Autowired
+	private ImageService awsS3Service;
+
+	@Autowired
+	private AwsConfigurations awsConfigurations;
+
 	/**
 	 * 
 	 * @param token
@@ -78,11 +89,12 @@ public class NoteServiceImpl implements NoteService {
 	 * @throws LabelNotFoundException
 	 * @throws NullValueException
 	 * @throws MalFormedException
+	 * @throws IOException
 	 */
 	@Override
 	public ViewNoteDTO createNote(String userId, CreateDTO createDto)
 			throws NoteNotFoundException, NoteCreationException, UnAuthorizedException, DateException,
-			LabelNotFoundException, NullValueException, MalFormedException {
+			LabelNotFoundException, NullValueException, MalFormedException, IOException {
 
 		NoteUtility.validateNoteCreation(createDto);
 
@@ -128,10 +140,10 @@ public class NoteServiceImpl implements NoteService {
 		List<String> descriptionList = new ArrayList<>();
 		descriptionList.add(createDto.getDescription());
 		note.setDescription(descriptionList);
+
 		noteRepository.save(note);
 
 		noteElasticRepository.save(note);
-		System.out.println(note);
 
 		ViewNoteDTO viewNoteDto = modelMapper.map(note, ViewNoteDTO.class);
 
@@ -428,8 +440,9 @@ public class NoteServiceImpl implements NoteService {
 	@Override
 	public List<ViewNoteDTO> readUserNotes(String userId) throws NullValueException {
 
-		// List<Note> noteList = noteRepository.findAllByUserId(userId);
-		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
+		List<Note> noteList = noteRepository.findAllByUserIdAndTrashed(userId, false);
+		// List<Note> noteList=noteElasticRepository.findAllByUserIdAndTrashed(userId,
+		// false);
 		if (noteList.isEmpty()) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
@@ -765,82 +778,138 @@ public class NoteServiceImpl implements NoteService {
 	/**
 	 * @param userId
 	 * @param order
-	 * @return noteDTO sorted by title
-	 * @throws NullValueException
-	 */
-	@Override
-	public List<ViewNoteDTO> viewNotesBySortedTitle(String userId, String order) throws NullValueException {
-
-		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
-		if (noteList.isEmpty()) {
-			throw new NullValueException(environment.getProperty("NullValueException"));
-		}
-
-		if (order.equals("asc")) {
-			return noteList.stream().sorted(Comparator.comparing(Note::getTitle))
-					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
-		}
-
-		if (order.equals("desc")) {
-
-			return noteList.stream().sorted(Comparator.comparing(Note::getTitle).reversed())
-					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
-		}
-		return null;
-	}
-
-	/**
-	 * @param userId
-	 * @param order
 	 * @return noteDTO sorted by date
 	 * @throws NullValueException
 	 */
 	@Override
-	public List<ViewNoteDTO> viewNotesBySortedDate(String userId, String order, String choice)
+	public List<ViewNoteDTO> viewNotesBySortedDateOrTitle(String userId, String order, String choice)
 			throws NullValueException {
 
 		List<Note> noteList = noteElasticRepository.findAllByUserIdAndTrashed(userId, false);
 		if (noteList.isEmpty()) {
 			throw new NullValueException(environment.getProperty("NullValueException"));
 		}
-		
-		if(choice==null&&order==null) {
+
+		if (choice == null && order == null) {
 			return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed())
 					.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
-		
+
 		}
 
 		if (choice.equals("date")) {
 
-			if (order==null||order.matches(".*")) {
+			if (order == null || order.matches(".*")) {
 				return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt).reversed())
 						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
 			}
-			
+
 			if (order.equalsIgnoreCase("asc")) {
 				return noteList.stream().sorted(Comparator.comparing(Note::getCreatedAt))
 						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
 			}
-			
+
 		}
 
 		if (choice.equals("title")) {
 
-			if (order==null||order.matches(".*")) {
+			if (order == null || order.matches(".*")) {
 				return noteList.stream().sorted(Comparator.comparing(Note::getTitle))
 						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
 
-				}
-			
+			}
+
 			if (order.equals("desc")) {
 
 				return noteList.stream().sorted(Comparator.comparing(Note::getTitle).reversed())
 						.map(SortedNote -> modelMapper.map(SortedNote, ViewNoteDTO.class)).collect(Collectors.toList());
 			}
-			
+
 		}
-		
+
 		return null;
 	}
 
+	@Override
+	public void addImageToNote(String userId, String noteId, MultipartFile image)
+			throws NoteNotFoundException, NoteTrashedException, UnAuthorizedException, IOException {
+		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
+
+		if (!checkNote.isPresent()) {
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
+		}
+
+		Note note = checkNote.get();
+
+		if (note.isTrashed()) {
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
+		}
+
+		if (!note.getUserId().equals(userId)) {
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
+		}
+
+		String fileName = userId + environment.getProperty("suffix") + noteId;
+
+		awsS3Service.uploadFile(fileName, image);
+
+		AmazonS3 client = awsConfigurations.getS3Client();
+
+		List<String> tempList = note.getImage();
+
+		String url = ((AmazonS3Client) client).getResourceUrl(environment.getProperty("bucketName"), fileName);
+
+		tempList.add(url);
+
+		note.setImage(tempList);
+
+		noteRepository.save(note);
+
+		noteElasticRepository.save(note);
+	}
+
+	@Override
+	public String removeImageFromNote(String userId, String noteId, String url)
+			throws NoteNotFoundException, NoteTrashedException, UnAuthorizedException, NullValueException {
+
+		Optional<Note> checkNote = noteElasticRepository.findById(noteId);
+
+		if (!checkNote.isPresent()) {
+			throw new NoteNotFoundException(environment.getProperty("NoteNotFoundException"));
+		}
+
+		Note note = checkNote.get();
+
+		if (note.isTrashed()) {
+			throw new NoteTrashedException(environment.getProperty("NoteTrashedException"));
+		}
+
+		if (!note.getUserId().equals(userId)) {
+			throw new UnAuthorizedException(environment.getProperty("UnAuthorizedException"));
+		}
+
+		String[] images = url.split(environment.getProperty("imageLink") + userId + environment.getProperty("suffix")
+				+ noteId + environment.getProperty("suffix"));
+		System.out.println(images[1]);
+
+		List<String> tempList = note.getImage();
+
+		for (int i = 0; i < tempList.size(); i++) {
+
+			if (!tempList.contains(
+					environment.getProperty("imageLink") + userId + environment.getProperty("suffix") + images[1])) {
+				throw new NullValueException(environment.getProperty("NullValueException"));
+
+			}
+		}
+
+		tempList.remove(environment.getProperty("imageLink") + userId + environment.getProperty("suffix") + images[1]);
+		note.setImage(tempList);
+
+		awsS3Service.deleteFile(url);
+
+		noteRepository.save(note);
+
+		noteElasticRepository.save(note);
+		return url;
+	}
 }

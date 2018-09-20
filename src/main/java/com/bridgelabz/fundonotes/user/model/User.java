@@ -15,6 +15,7 @@ public class User {
 	private String email;
 	private String password;
 	private boolean activate;
+	private String profilePic;
 	public User() {
 		super();
 	}
@@ -78,10 +79,21 @@ public class User {
 		this.activate = activate;
 	}
 
+	public String getProfilePic() {
+		return profilePic;
+	}
+
+
+	public void setProfilePic(String profilePic) {
+		this.profilePic = profilePic;
+	}
+
+
 	@Override
 	public String toString() {
-		return "User [email=" + email + ", firstname=" + firstname + ", lastname=" + lastname + ", phoneNo=" + phoneNo
-				+ ", password=" + password + ", activate=" + activate + "]";
+		return "User [id=" + id + ", firstname=" + firstname + ", lastname=" + lastname + ", phoneNo=" + phoneNo
+				+ ", email=" + email + ", password=" + password + ", activate=" + activate + ", profilePic="
+				+ profilePic + "]";
 	}
 	
 }

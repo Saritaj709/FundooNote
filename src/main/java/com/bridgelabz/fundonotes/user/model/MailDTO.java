@@ -1,6 +1,12 @@
 package com.bridgelabz.fundonotes.user.model;
 
-public class MailDTO {
+import java.io.Serializable;
+
+public class MailDTO implements Serializable{
+	/**
+	 * 
+	 */
+	private static final long serialVersionUID = 1L;
 	private String to;
 	private String subject;
 	private String text;

@@ -13,6 +13,7 @@ public class CreateDTO {
 	private Date reminder;
 	private boolean archieve;
 	private boolean pin;
+//	private String image;
 
 	public CreateDTO() {
 		
@@ -74,6 +75,14 @@ public class CreateDTO {
 	public void setPin(boolean pin) {
 		this.pin = pin;
 	}
+
+	/*public String getImage() {
+		return image;
+	}
+
+	public void setImage(String image) {
+		this.image = image;
+	}*/
 
 	@Override
 	public String toString() {

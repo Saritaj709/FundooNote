@@ -1,15 +1,9 @@
-package com.bridgelabz.fundonotes.user.model;
+package com.bridgelabz.fundonotes.note.model;
 
-import org.springframework.stereotype.Component;
-
-@Component
-public class ResponseDTO {
+public class ResponseDTONote {
+	
 	private String message;
 	private int status;
-
-	public ResponseDTO() {
-		super();
-	}
 
 	public String getMessage() {
 		return message;
@@ -25,6 +19,11 @@ public class ResponseDTO {
 
 	public void setStatus(int status) {
 		this.status = status;
+	}
+
+	@Override
+	public String toString() {
+		return "NoteResponseDTO [message=" + message + ", status=" + status + "]";
 	}
 
 }

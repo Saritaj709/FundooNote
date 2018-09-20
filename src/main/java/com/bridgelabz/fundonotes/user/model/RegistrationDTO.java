@@ -8,7 +8,7 @@ public class RegistrationDTO {
 	private String phoneNo;
 	private String password;
 	private String confirmPassword;
-
+	
 	public RegistrationDTO() {
 
 	}

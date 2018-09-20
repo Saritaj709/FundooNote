@@ -15,12 +15,9 @@ import io.jsonwebtoken.SignatureAlgorithm;
 @Service
 public class Token {
 
-	/*@Value("${Key}")
-	static String Key;
-	*/
-	private final static String KEY = "Sarita";
-
-	// Generate token for string
+	@Value("${Key}")
+	private String KEY;
+	
 	public String tokenGenerator(String email) {
 		String passkey = "verify";
 		long nowMillis = System.currentTimeMillis() + (20 * 60 * 60 * 1000);
@@ -30,7 +27,6 @@ public class Token {
 		return jwtBuilder.compact();
 	}
 
-	// Used for parsing the token
 	public String parseJwtToken(String jwt) {
 		Claims claims = Jwts.parser().setSigningKey(DatatypeConverter.parseBase64Binary(KEY)).parseClaimsJws(jwt)
 				.getBody();

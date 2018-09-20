@@ -1,9 +1,13 @@
-package com.bridgelabz.fundonotes.note.model;
+package com.bridgelabz.fundonotes.user.model;
 
 public class Response {
-	
 	private String message;
 	private int status;
+
+	public Response(String message, int status) {
+		this.message = message;
+		this.status = status;
+	}
 
 	public String getMessage() {
 		return message;
@@ -23,7 +27,7 @@ public class Response {
 
 	@Override
 	public String toString() {
-		return "NoteResponseDTO [message=" + message + ", status=" + status + "]";
+		return "Response [message=" + message + ", status=" + status + "]";
 	}
 
 }

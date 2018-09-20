@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.note.controller;
 
+import java.io.IOException;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -22,12 +23,14 @@ import com.bridgelabz.fundonotes.note.exception.NoteCreationException;
 import com.bridgelabz.fundonotes.note.exception.NoteNotFoundException;
 import com.bridgelabz.fundonotes.note.exception.NoteTrashedException;
 import com.bridgelabz.fundonotes.note.exception.NullValueException;
+import com.bridgelabz.fundonotes.note.exception.RestHighLevelClientException;
 import com.bridgelabz.fundonotes.note.exception.UnAuthorizedException;
 import com.bridgelabz.fundonotes.note.model.Label;
 import com.bridgelabz.fundonotes.note.model.LabelDTO;
-import com.bridgelabz.fundonotes.note.model.Response;
+import com.bridgelabz.fundonotes.note.model.ResponseDTONote;
 import com.bridgelabz.fundonotes.note.model.ViewNoteDTO;
 import com.bridgelabz.fundonotes.note.services.LabelService;
+import com.bridgelabz.fundonotes.user.model.Response;
 
 /**
  * @author bridgelabz
@@ -51,17 +54,19 @@ public class LabelController {
 		 * @throws NoteNotFoundException
 		 * @throws UnAuthorizedException
 		 * @throws NullValueException
+		 * @throws IOException 
 		 */
 		@PostMapping(value = "/create")
-		public ResponseEntity<LabelDTO> createLabelInsideNote(HttpServletRequest req,
+		public ResponseEntity<Response> createLabelInsideNote(HttpServletRequest req,
 				@RequestParam(value="labelName") String labelName)
-				throws NoteCreationException, NoteNotFoundException, UnAuthorizedException, NullValueException {
+				throws NoteCreationException, NoteNotFoundException, UnAuthorizedException, NullValueException, IOException {
 
 			String userId = (String) req.getAttribute("userId");
             
 			LabelDTO labelDto = labelService.createLabel(userId, labelName);
 
-			return new ResponseEntity<>(labelDto, HttpStatus.CREATED);
+			Response response=new Response("label created ",111);
+			return new ResponseEntity<>(response, HttpStatus.CREATED);
 		}
 
 		// ------------------View All Labels---------------------------
@@ -73,10 +78,11 @@ public class LabelController {
 		 * @throws NoteNotFoundException
 		 * @throws NoteTrashedException
 		 * @throws NullValueException
+		 * @throws IOException 
 		 */
 		@GetMapping(value = "/view-all-labels")
 		public ResponseEntity<List<Label>> viewAllLabels()
-				throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException, NullValueException {
+				throws UnAuthorizedException, NoteNotFoundException, NoteTrashedException, NullValueException, IOException {
 
 			labelService.viewLabels();
 
@@ -86,7 +92,7 @@ public class LabelController {
 		//-------------------View Labels Of A Particular Label--------------------------
 		
 		@GetMapping(value="/view-user-labels")
-		public ResponseEntity<List<LabelDTO>> viewUserLabels(HttpServletRequest req) throws NullValueException {
+		public ResponseEntity<List<LabelDTO>> viewUserLabels(HttpServletRequest req) throws NullValueException, IOException {
 			
 			String userId=(String) req.getAttribute("userId");
 			
@@ -107,11 +113,12 @@ public class LabelController {
 		 * @throws NoteTrashedException
 		 * @throws NullValueException
 		 * @throws LabelNotFoundException
+		 * @throws RestHighLevelClientException 
 		 */
 		@GetMapping(value = "/view-label/{labelId}")
 		public ResponseEntity<List<ViewNoteDTO>> viewLabel(HttpServletRequest req,
 				@PathVariable(value = "labelId") String labelId) throws UnAuthorizedException, NoteNotFoundException,
-				NoteTrashedException, NullValueException, LabelNotFoundException {
+				NoteTrashedException, NullValueException, LabelNotFoundException, RestHighLevelClientException {
 
 			String userId = (String) req.getAttribute("userId");
 			labelService.viewLabel(userId, labelId);
@@ -131,17 +138,18 @@ public class LabelController {
 		 * @throws UnAuthorizedException
 		 * @throws NoteTrashedException
 		 * @throws LabelAdditionException
+		 * @throws IOException 
 		 */
 		@PostMapping(value = "/add-label/{noteId}")
-		public ResponseEntity<Response> addLabelToNotes(HttpServletRequest req,
+		public ResponseEntity<ResponseDTONote> addLabelToNotes(HttpServletRequest req,
 				@RequestParam(value = "labelId") String labelId, @PathVariable(value = "noteId") String noteId)
-				throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException, LabelAdditionException {
+				throws NoteNotFoundException, UnAuthorizedException, NoteTrashedException, LabelAdditionException, IOException {
 
 			String userId = (String) req.getAttribute("userId");
 
 			labelService.addLabel(userId, labelId, noteId);
 
-			Response response = new Response();
+			ResponseDTONote response = new ResponseDTONote();
 
 			response.setMessage("Label is successfully added");
 			response.setStatus(15);
@@ -159,14 +167,14 @@ public class LabelController {
 		 * @throws Exception
 		 */
 		@DeleteMapping(value = "/delete-label/{labelId}")
-		public ResponseEntity<Response> deleteLabel(HttpServletRequest req, @PathVariable(value = "labelId") String labelId)
+		public ResponseEntity<ResponseDTONote> deleteLabel(HttpServletRequest req, @PathVariable(value = "labelId") String labelId)
 				throws Exception {
 
 			String userId = (String) req.getAttribute("userId");
 
 			labelService.removeLabel(userId, labelId);
 
-			Response response = new Response();
+			ResponseDTONote response = new ResponseDTONote();
 
 			response.setMessage("Label is successfully deleted");
 			response.setStatus(17);
@@ -185,7 +193,7 @@ public class LabelController {
 		 * @throws Exception
 		 */
 		@DeleteMapping(value = "/deletelabel-from-particular-note/{labelId}")
-		public ResponseEntity<Response> deleteLabelFromParticularNote(HttpServletRequest req,
+		public ResponseEntity<ResponseDTONote> deleteLabelFromParticularNote(HttpServletRequest req,
 				@RequestParam(value = "noteId") String noteId, @PathVariable(value = "labelId") String labelId)
 				throws Exception {
 
@@ -193,7 +201,7 @@ public class LabelController {
 
 			labelService.removeLabelFromNote(userId, noteId, labelId);
 
-			Response response = new Response();
+			ResponseDTONote response = new ResponseDTONote();
 
 			response.setMessage("Label from Note is successfully deleted");
 			response.setStatus(20);
@@ -212,14 +220,14 @@ public class LabelController {
 		 * @throws Exception
 		 */
 		@PutMapping(value = "/update-label/{labelId}")
-		public ResponseEntity<Response> updateLabel(HttpServletRequest req, @PathVariable(value = "labelId") String labelId,
+		public ResponseEntity<ResponseDTONote> updateLabel(HttpServletRequest req, @PathVariable(value = "labelId") String labelId,
 				@RequestParam(value = "updateNameTo") String labelName) throws Exception {
 
 			String userId = (String) req.getAttribute("userId");
 
 			labelService.editLabel(userId, labelId, labelName);
 
-			Response response = new Response();
+			ResponseDTONote response = new ResponseDTONote();
 
 			response.setMessage("Label is successfully updated");
 			response.setStatus(19);
@@ -233,9 +241,10 @@ public class LabelController {
 		 * @param order
 		 * @return LabelDTO in sorted order
 		 * @throws NullValueException
+		 * @throws IOException 
 		 */
 		@PostMapping(value = "/sort-labels-by-date-or-name")
-		public ResponseEntity<List<LabelDTO>> sortLabelsByDateOrName(HttpServletRequest req,@RequestParam(value="order,asc/desc",required=false)String order,@RequestParam(value="sortBy,date/name",required=false)String choice) throws NullValueException {
+		public ResponseEntity<List<LabelDTO>> sortLabelsByDateOrName(HttpServletRequest req,@RequestParam(value="order,asc/desc",required=false)String order,@RequestParam(value="sortBy,date/name",required=false)String choice) throws NullValueException, IOException {
 
 			String userId=(String) req.getAttribute("userId");
 			labelService.sortLabelsByDateOrName(userId,order,choice);
@@ -248,9 +257,10 @@ public class LabelController {
 		 * @param order
 		 * @return LabelDTO in sorted order
 		 * @throws NullValueException
+		 * @throws IOException 
 		 */
 		@PostMapping(value = "/sort-labels-by-Date")
-		public ResponseEntity<List<LabelDTO>> sortLabelsByDate(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order) throws NullValueException {
+		public ResponseEntity<List<LabelDTO>> sortLabelsByDate(HttpServletRequest req,@RequestParam(value="order,asc/desc")String order) throws NullValueException, IOException {
 
 			String userId=(String) req.getAttribute("userId");
 			labelService.sortLabelsByDate(userId,order);

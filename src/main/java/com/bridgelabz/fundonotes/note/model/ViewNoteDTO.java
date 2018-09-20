@@ -1,25 +1,35 @@
 package com.bridgelabz.fundonotes.note.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class ViewNoteDTO {
 	
-	String noteId;
-	String title;
-	String description;
-	Date createdAt;
-	Date lastModifiedAt;
-	List<Label> labels;
-	String color;
-	Date reminder;
-	boolean trashed;
-	boolean archieve;
-	boolean pin;
-	List<UrlMetaData> metaData;
+	private String noteId;
+	private String title;
+	private String description;
+	private Date createdAt;
+	private Date lastModifiedAt;
+	private List<Label> labels=new ArrayList<>();
+	private String color;
+	private Date reminder;
+	private boolean trashed;
+	private boolean archieve;
+	private boolean pin;
+	private List<UrlMetaData> metaData;
+	private List<String> images=new ArrayList<>();
 
 	public ViewNoteDTO() {
 		super();
+	}
+
+	public String getNoteId() {
+		return noteId;
+	}
+
+	public void setNoteId(String noteId) {
+		this.noteId = noteId;
 	}
 
 	public String getTitle() {
@@ -82,8 +92,8 @@ public class ViewNoteDTO {
 		return trashed;
 	}
 
-	public void setTrashed(boolean isTrashed) {
-		this.trashed = isTrashed;
+	public void setTrashed(boolean trashed) {
+		this.trashed = trashed;
 	}
 
 	public boolean isArchieve() {
@@ -102,15 +112,6 @@ public class ViewNoteDTO {
 		this.pin = pin;
 	}
 
-	
-	public String getNoteId() {
-		return noteId;
-	}
-
-	public void setNoteId(String noteId) {
-		this.noteId = noteId;
-	}
-
 	public List<UrlMetaData> getMetaData() {
 		return metaData;
 	}
@@ -119,12 +120,21 @@ public class ViewNoteDTO {
 		this.metaData = metaData;
 	}
 
+	public List<String> getImage() {
+		return images;
+	}
+
+	public void setImage(List<String> image) {
+		this.images = image;
+	}
+
 	@Override
 	public String toString() {
 		return "ViewNoteDTO [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
 				+ createdAt + ", lastModifiedAt=" + lastModifiedAt + ", labels=" + labels + ", color=" + color
 				+ ", reminder=" + reminder + ", trashed=" + trashed + ", archieve=" + archieve + ", pin=" + pin
-				+ ", urlMetaData=" + metaData + "]";
+				+ ", metaData=" + metaData + ", image=" + images + "]";
 	}
 
+	
 }

@@ -1,5 +1,6 @@
 package com.bridgelabz.fundonotes.note.model;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -8,7 +9,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 /*@Document(collection = "notes")
 @Service*/
-@Document(indexName="notesdb",type="note")
+@Document(indexName="notedb",type="note")
 public class Note {
 
 	@Id
@@ -23,8 +24,9 @@ public class Note {
 	private boolean trashed;
 	private boolean archieve;
 	private boolean pin;
-	private List<Label> Labels;
+	private List<Label> Labels=new ArrayList<>();
 	private List<UrlMetaData> metaData; 
+	private List<String> images=new ArrayList<>();
 
 	public Note() {
 		super();
@@ -136,12 +138,20 @@ public class Note {
 		this.metaData = metaData;
 	}
 
+	public List<String> getImage() {
+		return images;
+	}
+
+	public void setImage(List<String> image) {
+		this.images = image;
+	}
+
 	@Override
 	public String toString() {
 		return "Note [noteId=" + noteId + ", title=" + title + ", description=" + description + ", createdAt="
 				+ createdAt + ", userId=" + userId + ", lastModifiedAt=" + lastModifiedAt + ", color=" + color
 				+ ", reminder=" + reminder + ", trashed=" + trashed + ", archieve=" + archieve + ", pin=" + pin
-				+ ", Labels=" + Labels + ", metaData=" + metaData + "]";
+				+ ", Labels=" + Labels + ", metaData=" + metaData + ", image=" + images + "]";
 	}
 
 }

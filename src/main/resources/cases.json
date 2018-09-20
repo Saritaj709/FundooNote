@@ -1,0 +1,820 @@
+{
+	"TC-001": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				"email": [
+					"sarita709@gmail.com"
+				]
+			},
+			"body": {
+				"email": "sarita709@gmail.com",
+				"password": ""
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "User not found Exception, The user with this Email id does not exist",
+				"status": 1103
+			}
+		}
+	},
+	"TC-002": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				
+			},
+			"body": {
+				"email": "",
+				"password": ""
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Login error, Both email and password is null",
+				"status": 1102
+			}
+		}
+	},
+	"TC-003": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				"email": [
+					"sarita709@gmail.com"
+				]
+			},
+			"body": {
+				"email": "saritaj709@gmail.com",
+				"password": ""
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Login error, Password is null",
+				"status": 1102
+			}
+		}
+	},
+	"TC-004": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				"email": [
+					"sarita709@gmail.com"
+				]
+			},
+			"body": {
+				"email": "",
+				"password": "sarita"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Login error, email is null",
+				"status": 1102
+			}
+		}
+	},
+	"TC-005": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				"email": [
+					"sarita709@gmail.com"
+				]
+			},
+			"body": {
+				"email": "saritaj709@gmail.com",
+				"password": "sarita"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "OK",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "User Successfully logged in",
+				"status": 2
+			}
+		}
+	},
+	"TC-006": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				"email": [
+					"sarita709@gmail.com"
+				]
+			},
+			"body": {
+				"email": "saritaj709gmailcom",
+				"password": ""
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Login error, Email format is not valid",
+				"status": 1102
+			}
+		}
+	},
+	"TC-007": {
+		"request": {
+			"url": "/user/login",
+			"headers": {
+				"email": [
+					"sarita709@gmail.com"
+				]
+			},
+			"body": {
+				"email": "sarita709@gmail.com",
+				"password": "sarita"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "User not found Exception, The user with this Email id does not exist",
+				"status": 1103
+			}
+		}
+	},
+	"TC-008": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "sarita",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "",
+				"password": "sarita",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, User Lastname should have atleast 3 characters",
+				"status": 1101
+			}
+		}
+	},
+	"TC-009": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "sarita",
+				"email": "saritaj709@gmail.com",
+				"firstname": "",
+				"lastname": "jaiswal",
+				"password": "sarita",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, User Firstname should have atleast 3 characters",
+				"status": 1101
+			}
+		}
+	},
+	"TC-010": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "sarita",
+				"email": "",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "sarita",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, User email is not valid ,follow abc@gmail.com,abc.100@yahoo.com",
+				"status": 1101
+			}
+		}
+	},
+	"TC-011": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "sarita",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "sarita",
+				"phoneNo": ""
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, contact no. is invalid",
+				"status": 1101
+			}
+		}
+	},
+	"TC-012": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "sarita",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Password is invalid,should have atleast 4 characters",
+				"status": 1101
+			}
+		}
+	},
+	"TC-013": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "sarita",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Password is invalid ,both password should be same ",
+				"status": 1101
+			}
+		}
+	},
+	"TC-014": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "sarita",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "sarita972389",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Password is invalid ,both password should be same ",
+				"status": 1101
+			}
+		}
+	},
+	"TC-015": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "saritadgdgdzvgdzb",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "S1@rita",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Invalid Password Format",
+				"status": 1101
+			}
+		}
+	},
+	"TC-016": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "saritadgdgdzvgdzb",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "sarita972389vzvszbdzbfnfd fdvfdzbfdb gx nxfgng",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Invalid Password Format",
+				"status": 1101
+			}
+		}
+	},
+	"TC-017": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "saritadgdgdzvgdzb",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "saritazdgsdnh",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Password is invalid ,both password should be same",
+				"status": 1101
+			}
+		}
+	},
+	"TC-018": {
+		"request": {
+			"url": "/user/register",
+			"headers": {
+				
+			},
+			"body": {
+				"confirmPassword": "131321523637",
+				"email": "saritaj709@gmail.com",
+				"firstname": "sarita",
+				"lastname": "jaiswal",
+				"password": "131321523637",
+				"phoneNo": "5654494964"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Registration error, Invalid Password Format",
+				"status": 1101
+			}
+		}
+	},
+	"TC-019": {
+		"request": {
+			"url": "/api/notes/create",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				"archieve": true,
+				"color": "blue",
+				"description": "https://www.youtube.com/watch?v=Deq-0iMgg0M",
+				"labels": [
+					{
+						"labelCreatedAt": "2018-09-15T06:34:50.422Z",
+						"labelId": "12",
+						"labelName": "ball1",
+						"userId": "5b9b45481cace93587d6f3ce"
+					}
+				],
+				"pin": true,
+				"reminder": "2018-10-15T06:34:50.422Z",
+				"title": "json note"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "CREATED",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "note created",
+				"status": 12
+			}
+		}
+	},
+	"TC-020": {
+		"request": {
+			"url": "/api/notes/create",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				"archieve": true,
+				"color": "blue",
+				"description": "",
+				"labels": [
+					{
+						"labelCreatedAt": "2018-09-15T06:34:50.422Z",
+						"labelId": "12",
+						"labelName": "ball1",
+						"userId": "5b9b45481cace93587d6f3ce"
+					}
+				],
+				"pin": true,
+				"reminder": "2018-10-15T06:34:50.422Z",
+				"title": ""
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "note entry error, Both description and title cannot be null",
+				"status": 101
+			}
+		}
+	},
+	"TC-021": {
+		"request": {
+			"url": "/api/notes/create",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				"archieve": true,
+				"color": "blue",
+				"description": "",
+				"labels": [
+					{
+						"labelCreatedAt": "2018-09-15T06:34:50.422Z",
+						"labelId": "12341424",
+						"labelName": "ball",
+						"userId": "5b9b45481cace93587d6f3ce"
+					}
+				],
+				"pin": true,
+				"reminder": "2018-10-15T06:34:50.422Z",
+				"title": "test case "
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "CREATED",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "note created",
+				"status": 12
+			}
+		}
+	},
+	"TC-022": {
+		"request": {
+			"url": "/api/notes/create",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				"archieve": true,
+				"color": "blue",
+				"description": "",
+				"labels": [
+					{
+						"labelCreatedAt": "2018-09-15T06:34:50.422Z",
+						"labelId": "12341424",
+						"labelName": "ball",
+						"userId": "5b9b45481cace93587d6f3ce"
+					}
+				],
+				"pin": true,
+				"reminder": "2018-10-15T06:34:50.422Z",
+				"title": "test case "
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "CREATED",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "note created",
+				"status": 12
+			}
+		}
+	},
+	"TC-023": {
+		"request": {
+			"url": "/api/notes/create",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				"archieve": true,
+				"color": "blue",
+				"description": "coding",
+				"labels": [
+					{
+						"labelCreatedAt": "2018-09-15T06:34:50.422Z",
+						"labelId": "12341424",
+						"labelName": "ball",
+						"userId": "5b9b45481cace93587d6f3ce"
+					}
+				],
+				"pin": true,
+				"reminder": "2018-09-15T06:34:50.422Z",
+				"title": "test case "
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "date exception, reminder cannot be before current date",
+				"status": 113
+			}
+		}
+	},
+	"TC-024": {
+		"request": {
+			"url": "/api/notes/create",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				"archieve": true,
+				"color": "blue-green",
+				"description": "welcome all",
+				"labels": [
+					{
+						"labelCreatedAt": "2018-09-15T06:34:50.422Z",
+						"labelId": "12341424",
+						"labelName": "ball",
+						"userId": "5b9b45481cace93587d6f3ce"
+					}
+				],
+				"pin": true,
+				"reminder": "2018-10-15T06:34:50.422Z",
+				"title": "test case pass"
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "CREATED",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "note created",
+				"status": 12
+			}
+		}
+	},
+	"TC-025": {
+		"request": {
+			"url": "/api/labels/create?labelName=fruit",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "CREATED",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "label created ",
+				"status": 111
+			}
+		}
+	},
+	"TC-026": {
+		"request": {
+			"url": "/api/labels/create?labelName=fruit",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "no label available to set exception, label with this name already exists",
+				"status": 112
+			}
+		}
+	},
+	"TC-027": {
+		"request": {
+			"url": "/api/labels/create?labelName=",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "null value exception, Label name cannot be null",
+				"status": 401
+			}
+		}
+	},
+	"TC-028": {
+		"request": {
+			"url": "/api/labels/create?labelName=ajaghsgbhcfasgdyjwqfgwhefvbhsefgj",
+			"headers": {
+				"Authorization": [
+					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"
+				]
+			},
+			"body": {
+				
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "BAD_REQUEST",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "null value exception, Label name cannot be more than 20 characters",
+				"status": 401
+			}
+		}
+	},
+	"demo2": {
+		"request": {
+			"url": "/add",
+			"headers": {
+				"thirdNumber": [
+					11
+				],
+				"result": [
+					"Hi Sarita"
+				]
+			},
+			"body": {
+				"num1": 10,
+				"num2": 12
+			},
+			"method": "POST"
+		},
+		"response": {
+			"status": "OK",
+			"headers": {
+				
+			},
+			"body": {
+				"message": "Hi Sarita",
+				"status": 33
+			}
+		}
+	}
+}
+
+

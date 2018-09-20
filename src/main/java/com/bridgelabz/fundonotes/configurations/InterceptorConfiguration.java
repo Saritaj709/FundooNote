@@ -21,6 +21,6 @@ public class InterceptorConfiguration implements WebMvcConfigurer {
 	public void addInterceptors(InterceptorRegistry registry) {
 		
 		registry.addInterceptor(loggerInterceptor).addPathPatterns("/**");
-		registry.addInterceptor(notesInterceptor).addPathPatterns("/api/notes/**","/api/labels/**");
+		registry.addInterceptor(notesInterceptor).addPathPatterns("/api/notes/**","/api/labels/**","/user/upload-profilepic","/user/remove-profilepic");
 	}
 }

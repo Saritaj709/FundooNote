@@ -8,7 +8,7 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
 import com.bridgelabz.fundonotes.note.controller.NoteController;
-import com.bridgelabz.fundonotes.note.model.Response;
+import com.bridgelabz.fundonotes.note.model.ResponseDTONote;
 
 @ControllerAdvice
 public class GlobalExceptionHandlerForNote {
@@ -16,169 +16,186 @@ public class GlobalExceptionHandlerForNote {
 	public static final Logger logger = LoggerFactory.getLogger(NoteController.class);
 
 	@ExceptionHandler(NoteCreationException.class)
-	public ResponseEntity<Response> noteExceptionHandler(NoteCreationException e) {
+	public ResponseEntity<ResponseDTONote> noteExceptionHandler(NoteCreationException e) {
 		logger.error("note entry error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note entry error, " + e.getMessage());
 		response.setStatus(101);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoteNotFoundException.class)
-	public ResponseEntity<Response> noteNotFoundExceptionHandler(NoteNotFoundException e) {
+	public ResponseEntity<ResponseDTONote> noteNotFoundExceptionHandler(NoteNotFoundException e) {
 		logger.error("note not found error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note not found exception, " + e.getMessage());
 		response.setStatus(201);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(UnAuthorizedException.class)
-	public ResponseEntity<Response> userNotFoundExceptionHandler(UnAuthorizedException e) {
+	public ResponseEntity<ResponseDTONote> userNotFoundExceptionHandler(UnAuthorizedException e) {
 		logger.error("UnAuthorized error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("UnAuthorized exception, " + e.getMessage());
 		response.setStatus(301);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NullValueException.class)
-	public ResponseEntity<Response> nullEntryExceptionHandler(NullValueException e) {
+	public ResponseEntity<ResponseDTONote> nullEntryExceptionHandler(NullValueException e) {
 		logger.error("null value error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("null value exception, " + e.getMessage());
 		response.setStatus(401);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(UntrashedException.class)
-	public ResponseEntity<Response> untrashedExceptionHandler(UntrashedException e) {
+	public ResponseEntity<ResponseDTONote> untrashedExceptionHandler(UntrashedException e) {
 		logger.error("note untrashed error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note untrashed exception, " + e.getMessage());
 		response.setStatus(401);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoteTrashedException.class)
-	public ResponseEntity<Response> trashedNoteExceptionHandler(NoteTrashedException e) {
+	public ResponseEntity<ResponseDTONote> trashedNoteExceptionHandler(NoteTrashedException e) {
 		logger.error("note trashed error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note trashed exception, " + e.getMessage());
 		response.setStatus(601);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoRemiderToSetException.class)
-	public ResponseEntity<Response> noReminderToSetExceptionHandler(NoRemiderToSetException e) {
+	public ResponseEntity<ResponseDTONote> noReminderToSetExceptionHandler(NoRemiderToSetException e) {
 		logger.error("no reminder to set error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("no reminder to set exception, " + e.getMessage());
 		response.setStatus(701);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoteArchievedException.class)
-	public ResponseEntity<Response> noteArchievedExceptionHandler(NoteArchievedException e) {
+	public ResponseEntity<ResponseDTONote> noteArchievedExceptionHandler(NoteArchievedException e) {
 		logger.error("no reminder to set error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("no reminder to set exception, " + e.getMessage());
 		response.setStatus(801);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NotePinnedException.class)
-	public ResponseEntity<Response> notePinnedExceptionHandler(NotePinnedException e) {
+	public ResponseEntity<ResponseDTONote> notePinnedExceptionHandler(NotePinnedException e) {
 		logger.error("no reminder to set error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note pinned exception, " + e.getMessage());
 		response.setStatus(901);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoSuchLabelException.class)
-	public ResponseEntity<Response> noSuchLabelExceptionHandler(NoSuchLabelException e) {
+	public ResponseEntity<ResponseDTONote> noSuchLabelExceptionHandler(NoSuchLabelException e) {
 		logger.error("no label to set error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("no label available to set exception, " + e.getMessage());
 		response.setStatus(111);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(LabelCreationException.class)
-	public ResponseEntity<Response> labelCreationExceptionHandler(LabelCreationException e) {
+	public ResponseEntity<ResponseDTONote> labelCreationExceptionHandler(LabelCreationException e) {
 		logger.error("no label to set error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("no label available to set exception, " + e.getMessage());
 		response.setStatus(112);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(DateException.class)
-	public ResponseEntity<Response> dateExceptionHandler(DateException e) {
+	public ResponseEntity<ResponseDTONote> dateExceptionHandler(DateException e) {
 		logger.error("date error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("date exception, " + e.getMessage());
 		response.setStatus(113);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(LabelAdditionException.class)
-	public ResponseEntity<Response> LabelAdditionExceptionHandler(LabelAdditionException e) {
+	public ResponseEntity<ResponseDTONote> LabelAdditionExceptionHandler(LabelAdditionException e) {
 		logger.error("label addition error in list");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("label addition exception, " + e.getMessage());
 		response.setStatus(114);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(LabelNotFoundException.class)
-	public ResponseEntity<Response> labelNotFoundExceptionHandler(LabelNotFoundException e) {
+	public ResponseEntity<ResponseDTONote> labelNotFoundExceptionHandler(LabelNotFoundException e) {
 		logger.error("label not found error in list");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("label not found exception, " + e.getMessage());
 		response.setStatus(116);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoteUnPinnedException.class)
-	public ResponseEntity<Response> noteUnPinnedExceptionHandler(NoteUnPinnedException e) {
+	public ResponseEntity<ResponseDTONote> noteUnPinnedExceptionHandler(NoteUnPinnedException e) {
 		logger.error("note unpinned error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note unpinned exception, " + e.getMessage());
 		response.setStatus(119);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(NoteUnArchievedException.class)
-	public ResponseEntity<Response> noteUnArchievedExceptionHandler(NoteUnArchievedException e) {
+	public ResponseEntity<ResponseDTONote> noteUnArchievedExceptionHandler(NoteUnArchievedException e) {
 		logger.error("note unarchieved error");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("note unarchieved exception, " + e.getMessage());
 		response.setStatus(120);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(MalFormedException.class)
-	public ResponseEntity<Response> malformedExceptionHandler(MalFormedException e) {
+	public ResponseEntity<ResponseDTONote> malformedExceptionHandler(MalFormedException e) {
 		logger.error("malformed error jsoup");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("malformed exception jsoup, " + e.getMessage());
 		response.setStatus(121);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
 	@ExceptionHandler(UrlAdditionException.class)
-	public ResponseEntity<Response> urlAdditionExceptionHandler(UrlAdditionException
+	public ResponseEntity<ResponseDTONote> urlAdditionExceptionHandler(UrlAdditionException
 			 e) {
 		logger.error("malformed error jsoup");
-		Response response = new Response();
+		ResponseDTONote response = new ResponseDTONote();
 		response.setMessage("malformed exception jsoup, " + e.getMessage());
 		response.setStatus(122);
 		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(S3ClientException.class)
+	public ResponseEntity<ResponseDTONote> s3ClientExceptioHandler(S3ClientException
+			 e) {
+		logger.error("s3Client exception");
+		ResponseDTONote response = new ResponseDTONote();
+		response.setMessage("s3Client exception, " + e.getMessage());
+		response.setStatus(123);
+		return new ResponseEntity<>(response, HttpStatus.BAD_REQUEST);
+	}
 	
+	@ExceptionHandler(RestHighLevelClientException.class)
+	public ResponseEntity<ResponseDTONote> restHighLevelClientExceptionHandler(RestHighLevelClientException e){
+		logger.error("Rest high level client exception");
+		ResponseDTONote response=new ResponseDTONote();
+		response.setMessage("Rest high level client exception, "+e.getMessage());
+		response.setStatus(1106);
+		return new ResponseEntity<>(response,HttpStatus.BAD_REQUEST);
+	}
 	/*@ExceptionHandler(Exception.class)
 	public ResponseEntity<ResponseDTO> controller(Exception e) {
 		logger.error("other exceptions");

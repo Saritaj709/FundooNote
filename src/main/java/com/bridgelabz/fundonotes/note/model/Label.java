@@ -7,7 +7,7 @@ import org.springframework.data.elasticsearch.annotations.Document;
 
 /*@Document(collection="labels")
 @Service*/
-@Document(indexName = "labeldbs", type = "label")
+@Document(indexName = "labeldb", type = "label")
 public class Label {
 
 	@Id
