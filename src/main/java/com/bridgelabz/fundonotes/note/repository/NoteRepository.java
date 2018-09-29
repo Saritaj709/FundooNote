@@ -11,7 +11,7 @@ import java.util.Optional;
 import org.springframework.data.mongodb.repository.MongoRepository;
 
 @Repository
-public interface NoteRepository extends MongoRepository<Note,String>{
+public interface NoteRepository extends MongoRepository<Note, String> {
 
 	Optional<Note> findByNoteId(String noteId);
 
@@ -24,7 +24,4 @@ public interface NoteRepository extends MongoRepository<Note,String>{
 	List<Note> findAllByUserId(String userId);
 
 	List<Note> findAllByUserIdAndTrashed(String userId, boolean b);
-
-	//List<Note> findByAllUserId(String userId);
-
 }

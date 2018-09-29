@@ -30,22 +30,5 @@ public class UserInterceptor implements HandlerInterceptor {
 		}
 		return false;
 	}
-	/*@Override
-	public boolean preHandle(HttpServletRequest request,HttpServletResponse response,Object object) throws UnAuthorizedException {
-		
-		String token=request.getHeader("Authorization");
-		Optional<User> user=userRepository.findById(jwtToken.parseJwtToken(token));
-		if(user.isPresent()) {
-			Optional<User> user1=userRepository.findByEmail(user.get().getEmail());
-			if(!user1.isPresent()) {
-				throw new UnAuthorizedException("the user with given email does not exist");
-			}
-		request.setAttribute("userEmail",user.get().getEmail());
-		request.setAttribute("userId",jwtToken.parseJwtToken(token));
-			return true;
-		
-		}
-		return false;
-}*/
 }
 

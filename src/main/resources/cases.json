@@ -9,7 +9,7 @@
 			},
 			"body": {
 				"email": "sarita709@gmail.com",
-				"password": ""
+				"password": "hihello"
 			},
 			"method": "POST"
 		},
@@ -194,7 +194,7 @@
 				
 			},
 			"body": {
-				"message": "Registration error, User Lastname should have atleast 3 characters",
+				"message": "Registration error, User Lastname should have atleast 3 characters ",
 				"status": 1101
 			}
 		}
@@ -302,7 +302,7 @@
 				
 			},
 			"body": {
-				"message": "Registration error, Password is invalid,should have atleast 4 characters",
+				"message": "Registration error, Password is invalid,should have 8-32 characters",
 				"status": 1101
 			}
 		}
@@ -318,7 +318,7 @@
 				"email": "saritaj709@gmail.com",
 				"firstname": "sarita",
 				"lastname": "jaiswal",
-				"password": "sarita",
+				"password": "sarita909",
 				"phoneNo": "5654494964"
 			},
 			"method": "POST"
@@ -329,7 +329,7 @@
 				
 			},
 			"body": {
-				"message": "Registration error, Password is invalid ,both password should be same ",
+				"message": "Registration error, Password is invalid ,both password should be same",
 				"status": 1101
 			}
 		}
@@ -356,7 +356,7 @@
 				
 			},
 			"body": {
-				"message": "Registration error, Password is invalid ,both password should be same ",
+				"message": "Registration error, Password is invalid ,both password should be same",
 				"status": 1101
 			}
 		}
@@ -369,10 +369,10 @@
 			},
 			"body": {
 				"confirmPassword": "saritadgdgdzvgdzb",
-				"email": "saritaj709@gmail.com",
+				"email": "sarita709@gmail.com",
 				"firstname": "sarita",
 				"lastname": "jaiswal",
-				"password": "S1@rita",
+				"password": "S1@rita006",
 				"phoneNo": "5654494964"
 			},
 			"method": "POST"
@@ -396,7 +396,7 @@
 			},
 			"body": {
 				"confirmPassword": "saritadgdgdzvgdzb",
-				"email": "saritaj709@gmail.com",
+				"email": "sarita709@gmail.com",
 				"firstname": "sarita",
 				"lastname": "jaiswal",
 				"password": "sarita972389vzvszbdzbfnfd fdvfdzbfdb gx nxfgng",
@@ -410,7 +410,7 @@
 				
 			},
 			"body": {
-				"message": "Registration error, Invalid Password Format",
+				"message": "Registration error, Password is invalid,should have 8-32 characters",
 				"status": 1101
 			}
 		}
@@ -426,7 +426,7 @@
 				"email": "saritaj709@gmail.com",
 				"firstname": "sarita",
 				"lastname": "jaiswal",
-				"password": "saritazdgsdnh",
+				"password": "sarita9091",
 				"phoneNo": "5654494964"
 			},
 			"method": "POST"
@@ -693,7 +693,7 @@
 	},
 	"TC-025": {
 		"request": {
-			"url": "/api/labels/create?labelName=fruit",
+			"url": "/api/labels/create?labelName=trim1",
 			"headers": {
 				"Authorization": [
 					"eyJhbGciOiJIUzI1NiJ9.eyJqdGkiOiJ2ZXJpZnkiLCJpYXQiOjE1MzcwNjUzNzcsInN1YiI6IjViOWI0NTQ4MWNhY2U5MzU4N2Q2ZjNjZSJ9.GRRXGD-YIBDSOl2vYn_7YmL4_q_a1lRlh7K_k6BGQwk"

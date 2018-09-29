@@ -11,8 +11,8 @@ import com.bridgelabz.fundonotes.user.model.RegistrationDTO;
 public class UserUtility {
 
 	private final static String EMAIL = "^\\w+@\\w+\\..{2,3}(.{2,3})?$";
-    private final static String PASSWORD="^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,32}$";
-    
+	private final static String PASSWORD = "^(?=.*[A-Za-z])(?=.*\\d)[A-Za-z\\d]{8,32}$";
+
 	public static void validateUser(RegistrationDTO user) throws RegistrationException {
 		if (!user.getEmail().matches(EMAIL) || user.getEmail() == null) {
 			throw new RegistrationException("User email is not valid ,follow abc@gmail.com,abc.100@yahoo.com");
@@ -24,14 +24,15 @@ public class UserUtility {
 
 		else if (user.getPhoneNo().length() != 10) {
 			throw new RegistrationException("contact no. is invalid");
-			
-		} 
-		else if(!user.getPassword().matches(PASSWORD)) {
-		throw new RegistrationException("Invalid Password Format");
-		}
-		/*else if (user.getPassword().length() < 8||user.getPassword().length()>32) {
+
+		} else if (user.getPassword().length() < 8 || user.getPassword().length() > 32) {
+
 			throw new RegistrationException("Password is invalid,should have 8-32 characters");
-		}*/ else if (!user.getConfirmPassword().equals(user.getPassword())) {
+		} else if (!user.getPassword().matches(PASSWORD)) {
+			throw new RegistrationException("Invalid Password Format");
+		}
+
+		else if (!user.getConfirmPassword().equals(user.getPassword())) {
 			throw new RegistrationException("Password is invalid ,both password should be same");
 		}
 	}

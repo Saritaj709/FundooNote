@@ -179,23 +179,17 @@ public class NoteServiceImpl implements NoteService {
 		String[] contents = url.split(" ");
 
 		descriptionList = note.getDescription();
-		// if (descriptionList != null) {
 
 		for (int i = 0; i < descriptionList.size(); i++) {
-
-			// if(contents.length>0) {
 
 			for (int j = 0; j < contents.length; j++) {
 				UrlValidator validator = new UrlValidator();
 				if (validator.isValid(contents[j]) && descriptionList.contains(contents[j])) {
-					// if (descriptionList.contains(contents[j])) {
 					throw new UrlAdditionException(environment.getProperty("UrlAdditionException"));
 				}
 			}
 		}
-		// }
-		// }
-		// }
+		
 		descriptionList.add(url);
 		List<String> desList = descriptionList;
 		note.setDescription(desList);
